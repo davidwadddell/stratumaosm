@@ -1,0 +1,38 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "config": {
+        "type": "object"
+        },
+        "nfviIdValue": {
+        "type": "string"
+        },
+        "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.HybridNetwork/networkFunctions",
+            "apiVersion": "2023-04-01-preview",
+            "name": "[parameters('config').nfName]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "location": "[parameters('location')]",
+            "properties": {
+                "publisherName": "[parameters('config').publisherName]",
+                "publisherScope": "Private",
+                "networkFunctionDefinitionGroupName": "[parameters('config').networkFunctionDefinitionGroupName]",
+                "networkFunctionDefinitionVersion": "[parameters('config').networkFunctionDefinitionVersion]",
+                "networkFunctionDefinitionOfferingLocation": "[parameters('config').networkFunctionDefinitionOfferingLocation]",
+                "nfviType": "AzureOperatorNexus",
+                "nfviId": "[parameters('nfviIdValue')]",
+                "allowSoftwareUpdate": true,
+                "deploymentValues": "[string(createObject('extendedLocationResourceId', parameters('nfviIdValue'), 'cloudServicesNetworkAttachment', parameters('config').cloudServicesNetworkAttachment, 'networkAttachments', parameters('config').networkAttachments, 'virtualMachineName', parameters('config').vmName, 'cpuCores', parameters('config').cpuCores, 'memorySizeGB', parameters('config').memorySizeGB, 'sshPublicKeys', parameters('config').sshPublicKeys, 'userData', parameters('config').userData, 'networkData', parameters('config').networkData, 'storageProfile', parameters('config').storageProfile, 'placementHints', parameters('config').placementHints))]"
+            }
+        }
+    ]
+}

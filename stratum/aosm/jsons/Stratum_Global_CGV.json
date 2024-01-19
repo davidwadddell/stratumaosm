@@ -1,0 +1,23 @@
+{
+    "global": {
+      "imagePullPolicy": "IfNotPresent",
+      "storageClass": "nexus-volume",
+      "ildService": {
+        "loadBalancerIPs": [
+          "10.101.65.11",
+          "10.101.65.12"
+        ]
+      },
+      "timezone": "UTC",
+      "emsServices": {
+        "loadBalancerIPs": {
+          "ems01": [
+            "10.101.65.1"
+          ],
+          "ems02": [
+            "10.101.65.2"
+          ]
+        }
+      }
+    }
+  }

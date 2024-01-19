@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+    "nfDefinitionVersion": {
+      "value": "1.0.0"
+    },
+    "nsDesignVersion": {
+      "value": "1.0.0"
+    },
+    "uploadedNfArmTemplateVersion": {
+      "value": "1.0.0"
+    },
+    "uploadedVmTemplateVersion": {
+      "value": "1.0.0"
+    },
+    "uploadedVmImageVersion": {
+      "value": "1.0.0"
+    },
+    "nfviFromSite": {
+      "value": "nexus-vnf-nfvi"
+    },
+    "existingPublisherName": {
+      "value": "EneaPublisher"
+    },
+    "existingArtifactStoreName": {
+      "value": "EneaArtifactStore"
+    },
+    "existingNfdgName": {
+      "value": "EneaToolingVMnfdg"
+    },
+    "existingNsdgName": {
+      "value": "EneaToolingVMnsdg"
+    },
+    "uploadedVmImageName": {
+      "value": "eneatoolingvmimage"
+    },
+    "uploadedVmTemplateName": {
+      "value": "eneatoolingvmvmtemplate"
+    },
+    "uploadedNfTemplateName": {
+      "value": "eneatoolingvmnftemplate"
+    },
+    "nexusVnfCgsName": {
+      "value": "EneaToolingCgs"
+    }
+  }
+}

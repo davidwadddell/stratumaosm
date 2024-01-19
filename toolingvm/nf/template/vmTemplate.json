@@ -1,0 +1,105 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location":{
+            "type": "string",
+            "defaultValue": "eastus"
+        },
+        "networkAttachments": {
+            "type": "array"
+        },
+        "cloudServicesNetworkAttachment": {
+            "type": "object"
+        },
+        "virtualMachineName": {
+            "type": "string"
+        },
+        "extendedLocationResourceId":{
+            "type": "string"
+        },
+        "cpuCores":{
+            "type": "int"                     
+        },
+        "memorySizeGB":{
+            "type": "int"
+        },
+        "vmImageLocation":{
+            "type": "string"
+        },
+        "sshPublicKeys":{
+            "type": "array"
+        },
+        "storageProfile":{
+            "type": "object"
+        },
+        "adminUsername":{
+            "type": "string",
+            "defaultValue": "root"
+        },
+        "bootMethod":{
+            "type": "string",
+            "defaultValue": "BIOS"
+        },
+        "acrTokenUsername":{
+            "type": "string"
+        },
+        "acrTokenPassword":{
+            "type": "securestring"
+        },
+        "acrTokenRegistryUrl":{
+            "type": "string"
+        },
+        "placementHints":{
+            "type": "array",
+            "defaultValue": []
+        },
+        "userData":{
+            "type": "string"
+        },
+        "networkData":{
+            "type": "string"
+        }
+    },
+    "functions": [],
+    "variables": {
+        "storageProfile": {
+            "osDisk": {
+                "createOption":"Ephemeral",
+                "deleteOption":"Delete"
+            }
+        }
+    },
+    "resources": [
+        {
+        "name": "[parameters('virtualMachineName')]",
+        "type": "Microsoft.NetworkCloud/virtualMachines",
+        "apiVersion": "2022-12-12-preview",
+        "location": "[parameters('location')]",
+        "extendedLocation": {
+            "name": "[parameters('extendedLocationResourceId')]",
+	        "type": "CustomLocation"
+        },
+        "tags": {},
+        "properties": {            
+            "cpuCores": "[parameters('cpuCores')]",
+            "memorySizeGB": "[parameters('memorySizeGB')]",
+            "networkAttachments": "[parameters('networkAttachments')]",
+            "sshPublicKeys": "[parameters('sshPublicKeys')]",
+            "placementHints": "[parameters('placementHints')]",
+            "cloudServicesNetworkAttachment": "[parameters('cloudServicesNetworkAttachment')]",
+            "storageProfile": "[union(variables('storageProfile'), parameters('storageProfile'))]",
+            "userData": "[parameters('userData')]",
+            "networkData": "[parameters('networkData')]",
+            "vmImage": "[parameters('vmImageLocation')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "bootMethod": "[parameters('bootMethod')]",
+            "vmImageRepositoryCredentials":{
+                "username": "[parameters('acrTokenUsername')]",
+                "password": "[parameters('acrTokenPassword')]",
+                "registryUrl": "[parameters('acrTokenRegistryUrl')]"
+            }
+        }
+    }],
+    "outputs": {}
+}

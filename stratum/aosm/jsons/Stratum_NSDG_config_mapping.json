@@ -1,0 +1,154 @@
+[
+    {
+        "Values": {
+            "tags": {
+                "deployCommon": "true"
+            },
+            "global": {
+                "site": "{configurationparameters('StratumSiteConfiguration').global.site}",
+                "ildService": {
+                    "loadBalancerIPs": "{configurationparameters('StratumGlobalConfiguration').global.ildService.loadBalancerIPs}"
+                },
+                "emsServices": {
+                    "loadBalancerIPs": {
+                        "ems01": "{configurationparameters('StratumGlobalConfiguration').global.emsServices.loadBalancerIPs.ems01}",
+                        "ems02": "{configurationparameters('StratumGlobalConfiguration').global.emsServices.loadBalancerIPs.ems02}"
+                    }
+                }
+            }
+        },
+        "Version": "4.1.4"
+    },
+    {
+        "Values": {     
+            "tags": {               
+                "deployEms01": "true"
+            },
+            "global": {
+                "imagesRegistry": "{configurationparameters('StratumSiteConfiguration').global.imagesRegistry}",
+                "imagePullPolicy": "{configurationparameters('StratumGlobalConfiguration').global.imagePullPolicy}",
+                "imagePullSecrets": "{configurationparameters('StratumSiteConfiguration').global.imagePullSecrets}",
+                "storageClass": "{configurationparameters('StratumGlobalConfiguration').global.storageClass}",
+                "timezone": "{configurationparameters('StratumGlobalConfiguration').global.timezone}"
+            },
+            "ems01": {
+                "image": "{configurationparameters('StratumSiteConfiguration').ems01.image}",               
+                "optopwv_vol_request": "{configurationparameters('StratumSiteConfiguration').ems01.optopwv_vol_request}",
+                "varoptopwv_vol_request": "{configurationparameters('StratumSiteConfiguration').ems01.varoptopwv_vol_request}",
+                "ordb_vol_request": "{configurationparameters('StratumSiteConfiguration').ems01.ordb_vol_request}",
+                "toolsreportingrepo_vol_request": "{configurationparameters('StratumSiteConfiguration').ems01.toolsreportingrepo_vol_request}",
+                "remotenotify_vol_request": "{configurationparameters('StratumSiteConfiguration').ems01.remotenotify_vol_request}",
+                "standard_cli_script": "{configurationparameters('StratumSiteConfiguration').ems01.standard_cli_script}",
+                "custom_cli_script": "{configurationparameters('StratumSiteConfiguration').ems01.custom_cli_script}",
+                "node_selector": "{configurationparameters('StratumSiteConfiguration').ems01.node_selector}"
+            }
+        },        
+        "Version": "4.1.4"        
+    },
+    {
+        "Values": {
+            "tags": {            
+                "deployEms02": "true"
+            },
+            "global": {
+                "imagesRegistry": "{configurationparameters('StratumSiteConfiguration').global.imagesRegistry}",
+                "imagePullPolicy": "{configurationparameters('StratumGlobalConfiguration').global.imagePullPolicy}",
+                "imagePullSecrets": "{configurationparameters('StratumSiteConfiguration').global.imagePullSecrets}",                
+                "storageClass": "{configurationparameters('StratumGlobalConfiguration').global.storageClass}",
+                "timezone": "{configurationparameters('StratumGlobalConfiguration').global.timezone}"                
+            },
+            "ems02": {
+                "image": "{configurationparameters('StratumSiteConfiguration').ems02.image}",
+                "optopwv_vol_request": "{configurationparameters('StratumSiteConfiguration').ems02.optopwv_vol_request}",
+                "varoptopwv_vol_request": "{configurationparameters('StratumSiteConfiguration').ems02.varoptopwv_vol_request}",
+                "ordb_vol_request": "{configurationparameters('StratumSiteConfiguration').ems02.ordb_vol_request}",
+                "toolsreportingrepo_vol_request": "{configurationparameters('StratumSiteConfiguration').ems02.toolsreportingrepo_vol_request}",
+                "remotenotify_vol_request": "{configurationparameters('StratumSiteConfiguration').ems02.remotenotify_vol_request}",
+                "node_selector": "{configurationparameters('StratumSiteConfiguration').ems02.node_selector}"
+            }
+        },        
+        "Version": "4.1.4"  
+    },
+    {
+        "Values": {
+            "tags": {
+                "deployRegions": "true"
+            },
+            "global": {
+                "site": "{configurationparameters('StratumSiteConfiguration').global.site}",                
+                "imagesRegistry": "{configurationparameters('StratumSiteConfiguration').global.imagesRegistry}",
+                "imagePullPolicy": "{configurationparameters('StratumGlobalConfiguration').global.imagePullPolicy}",
+                "imagePullSecrets": "{configurationparameters('StratumSiteConfiguration').global.imagePullSecrets}",                
+                "storageClass": "{configurationparameters('StratumGlobalConfiguration').global.storageClass}",
+                "timezone": "{configurationparameters('StratumGlobalConfiguration').global.timezone}"                
+            },
+            "regions": {
+                "init_container_image": "{configurationparameters('StratumSiteConfiguration').regions.init_container_image}",
+                "regionsToDeploy": "{configurationparameters('StratumSiteConfiguration').regions.regionsToDeploy}",
+                "regions": [
+                    {
+                        "name": "region1",
+                        "affinities": {
+                            "requiredAffinity": "{configurationparameters('StratumSiteConfiguration').regions.regions[0].affinities.requiredAffinity}"
+                        },
+                        "csmLoadBalancerIPs": "{configurationparameters('StratumSiteConfiguration').regions.regions[0].csmLoadBalancerIPs}"
+                    },
+                    {
+                        "name": "region2",
+                        "affinities": {
+                            "requiredAffinity": "{configurationparameters('StratumSiteConfiguration').regions.regions[1].affinities.requiredAffinity}"
+                        },
+                        "csmLoadBalancerIPs": "{configurationparameters('StratumSiteConfiguration').regions.regions[1].csmLoadBalancerIPs}"
+                    }
+                ],
+                "process_pinning_enabled": "{configurationparameters('StratumSiteConfiguration').regions.process_pinning_enabled}",
+                "ild": {
+                    "image": "{configurationparameters('StratumSiteConfiguration').regions.ild.image}",
+                    "replicas": "{configurationparameters('StratumSiteConfiguration').regions.ild.replicas}",
+                    "cpu_request": "{configurationparameters('StratumSiteConfiguration').regions.ild.cpu_request}",
+                    "cpu_limit": "{configurationparameters('StratumSiteConfiguration').regions.ild.cpu_limit}",
+                    "mem_request": "{configurationparameters('StratumSiteConfiguration').regions.ild.mem_request}",
+                    "mem_limit": "{configurationparameters('StratumSiteConfiguration').regions.ild.mem_limit}",
+                    "node_selector": "{configurationparameters('StratumSiteConfiguration').regions.ild.node_selector}"                    
+                },
+                "adm": {
+                    "image": "{configurationparameters('StratumSiteConfiguration').regions.adm.image}",
+                    "replicas": "{configurationparameters('StratumSiteConfiguration').regions.adm.replicas}",
+                    "cpu_request": "{configurationparameters('StratumSiteConfiguration').regions.adm.cpu_request}",
+                    "cpu_limit": "{configurationparameters('StratumSiteConfiguration').regions.adm.cpu_limit}",
+                    "mem_request": "{configurationparameters('StratumSiteConfiguration').regions.adm.mem_request}",
+                    "mem_limit": "{configurationparameters('StratumSiteConfiguration').regions.adm.mem_limit}",
+                    "ddm_vol_request": "{configurationparameters('StratumSiteConfiguration').regions.adm.ddm_vol_request}",
+                    "node_selector": "{configurationparameters('StratumSiteConfiguration').regions.adm.node_selector}"
+                },
+                "csm": {
+                    "image": "{configurationparameters('StratumSiteConfiguration').regions.csm.image}",
+                    "replicas": "{configurationparameters('StratumSiteConfiguration').regions.csm.replicas}",
+                    "cpu_request": "{configurationparameters('StratumSiteConfiguration').regions.csm.cpu_request}",
+                    "cpu_limit": "{configurationparameters('StratumSiteConfiguration').regions.csm.cpu_limit}",
+                    "mem_request": "{configurationparameters('StratumSiteConfiguration').regions.csm.mem_request}",
+                    "mem_limit": "{configurationparameters('StratumSiteConfiguration').regions.csm.mem_limit}",
+                    "ddm_vol_request": "{configurationparameters('StratumSiteConfiguration').regions.csm.ddm_vol_request}",
+                    "otherRegionCSMs": "{configurationparameters('StratumSiteConfiguration').regions.csm.otherRegionCSMs}",
+                    "node_selector": "{configurationparameters('StratumSiteConfiguration').regions.csm.node_selector}"
+                }
+            }
+        },        
+        "Version": "4.1.4"         
+    },
+    {
+        "Values": {
+            "tags": {
+                "deployPyTest": "true"
+            },
+            "global": {
+                "site": "{configurationparameters('StratumSiteConfiguration').global.site}",                
+                "imagesRegistry": "{configurationparameters('StratumSiteConfiguration').global.imagesRegistry}",
+                "imagePullSecrets": "{configurationparameters('StratumSiteConfiguration').global.imagePullSecrets}",                
+                "imagePullPolicy": "{configurationparameters('StratumGlobalConfiguration').global.imagePullPolicy}"
+            }
+        },        
+        "Version": "4.1.4"
+    }
+]
+

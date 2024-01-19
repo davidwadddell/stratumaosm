@@ -1,0 +1,13 @@
+{
+    "extendedLocationResourceId": "{deployParameters.extendedLocationResourceId}",
+    "cloudServicesNetworkAttachment": "{deployParameters.cloudServicesNetworkAttachment}",
+    "networkAttachments": "{deployParameters.networkAttachments}",
+    "virtualMachineName": "{deployParameters.virtualMachineName}",
+    "cpuCores": "{deployParameters.cpuCores}",
+    "memorySizeGB": "{deployParameters.memorySizeGB}",
+    "sshPublicKeys": "{deployParameters.sshPublicKeys}",
+    "userData": "{deployParameters.userData}",
+    "networkData": "{deployParameters.networkData}",
+    "storageProfile": "{deployParameters.storageProfile}",
+    "placementHints": "{deployParameters.placementHints}"
+}

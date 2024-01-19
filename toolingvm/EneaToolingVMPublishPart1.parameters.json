@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": { 
+      	    "value": "eastus"     
+    },
+    "nfTemplateVersion": {   
+	    "value": "1.0.0"
+    },
+    "vmTemplateVersion": {
+      "value": "1.0.0"
+    },
+    "vmImageVersion": {
+      "value": "1.0.0"
+    },
+    "publisherName": {
+      "value": "EneaPublisher"
+    },
+    "artifactStoreName": {
+      "value": "EneaArtifactStore"
+    },
+    "artifactManifestName": {
+      "value": "EneaToolingVMManifest"
+    },
+    "nfdgName": {
+      "value": "EneaToolingVMnfdg"
+    },
+    "nsdgName": {
+      "value": "EneaToolingVMnsdg"
+    },
+    "vmImageName": {
+      "value": "eneatoolingvmimage"
+    },
+    "vmTemplateName": {
+      "value": "eneatoolingvmvmtemplate"
+    },
+    "nfTemplateName": {
+      "value": "eneatoolingvmnftemplate"
+    }
+  }
+}

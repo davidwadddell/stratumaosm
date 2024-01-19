@@ -1,0 +1,4 @@
+{
+    "config": "{configurationparameters('nexusVnfConfiguration').nexusVnfConfig}",
+    "nfviIdValue": "{nfvis('nfvi1').customLocationReference.id}"
+}

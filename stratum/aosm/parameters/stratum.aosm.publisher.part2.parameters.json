@@ -1,0 +1,28 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "publisherName": {
+            "value": "EneaPublisher1"
+        },
+        "artifactStore": {
+            "value": "EneaArtifactStore1"
+        },
+        "nfdgroupName": {
+            "value": "StratumNFDG"
+        },
+        "nfdversion": {
+            "value": "1.0.0"
+        },
+        "cnfName": {
+            "value": "StratumCNF"
+        },
+        "nsdGroup": {
+            "value": "StratumNSDG"
+        },
+        "nsdvName": {
+            "value": "1.0.0"
+        }
+    }
+}
+

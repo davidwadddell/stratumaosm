@@ -1,0 +1,6 @@
+#cloud-config
+users:
+  - name: root
+    lock_passwd: false
+    hashed_passwd: '$6$rounds=4096$rDBggCGHN04jKoqF$FD4BxEQMZklldUqKHJYwG1ue5LbsBctCoc7q6G.FRbl8FcB4UuM8punoK2QTkh.cnILG7PLhmiJXsBuX/Vbh5/'
+

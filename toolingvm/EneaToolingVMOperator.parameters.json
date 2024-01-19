@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+    "nfviFromSite": {
+      "value": "nexus-vnf-nfvi"
+    },
+    "customlocationId": {
+      "value": "/subscriptions/d86da6b7-31a4-48f7-8bc1-2a643f539ca7/resourcegroups/pct1-a5c20be9907d-hostedresources-79383a1a/providers/microsoft.extendedlocation/customlocations/pct1-a5c20be9907d-cstm-loc"
+    },
+    "nsdVersion": {
+      "value": "1.0.0"
+    },
+    "existingPublisherName": {
+      "value": "EneaPublisher"
+    },
+    "existingNsdgName": {
+      "value": "EneaToolingVMnsdg"
+    },
+    "existingCgsName": {
+      "value": "EneaToolingCgs"
+    },
+    "snsName": {
+      "value": "EneaToolingSNS"
+    },
+    "cgvName": {
+      "value": "EneaToolingCGV"
+    },
+    "siteName": {
+      "value": "EneaToolingSite"
+    }
+  }
+}

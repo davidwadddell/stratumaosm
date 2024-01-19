@@ -1,0 +1,169 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "type": "object",
+    "properties": {
+        "extendedLocationResourceId": {
+            "type": "string"
+        },
+        "cloudServicesNetworkAttachment": {
+            "type": "object",
+            "properties": {
+                "attachedNetworkId": {
+                    "type": "string"
+                },
+                "defaultGateway": {
+                    "type": "string",
+                    "enum": [
+                      "True",
+                      "False"
+                    ]
+                },
+                "ipAllocationMethod": {
+                    "type": "string",
+                    "enum": [
+                      "Dynamic",
+                      "Static",
+                      "Disabled"
+                    ]
+                },
+                "networkAttachmentName": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "attachedNetworkId",
+                "ipAllocationMethod"
+            ]
+        },
+        "networkAttachments": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "attachedNetworkId": {
+                        "type": "string"
+                    },
+                    "defaultGateway": {
+                        "type": "string",
+                        "enum": [
+                          "True",
+                          "False"
+                        ]
+                    },
+                    "ipAllocationMethod": {
+                        "type": "string",
+                        "enum": [
+                          "Dynamic",
+                          "Static",
+                          "Disabled"
+                        ]
+                    },
+                    "networkAttachmentName": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "attachedNetworkId",
+                    "ipAllocationMethod"
+                ]
+            }
+        },
+        "virtualMachineName": {
+            "type": "string"
+        },
+        "cpuCores": {
+            "type": "integer"
+        },
+        "memorySizeGB": {
+            "type": "integer"
+        },
+        "storageProfile": {
+            "type": "object",
+            "properties": {
+                "osDisk": {
+                    "type": "object",
+                    "properties": {
+                        "diskSizeGB": {
+                            "type": "integer"
+                        }
+                    },
+                    "required": [
+                        "diskSizeGB"
+                    ]
+                }
+            },
+            "required": [
+                "osDisk"
+            ]
+        },
+        "sshPublicKeys": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "keyData": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "keyData"
+                ]
+            }
+        },
+        "userData": {
+            "type": "string"
+        },
+        "networkData": {
+            "type": "string"
+        },
+        "placementHints": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "hintType": {
+                        "type": "string",
+                        "enum": [
+                            "Affinity",
+                            "AntiAffinity"
+                        ]
+                    },
+                    "resourceId": {
+                        "type": "string"
+                    },
+                    "schedulingExecution": {
+                        "type": "string",
+                        "enum": [
+                            "Soft",
+                            "Hard"
+                        ]
+                    },
+                    "scope": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "hintType",
+                    "schedulingExecution",
+                    "resourceId",
+                    "scope"
+                ]
+            }
+        }
+    },
+    "required": [
+        "extendedLocationResourceId",
+        "cloudServicesNetworkAttachment",
+        "networkAttachments",
+        "virtualMachineName",
+        "cpuCores",
+        "memorySizeGB",
+        "sshPublicKeys",
+        "userData",
+        "networkData",
+        "storageProfile",
+        "placementHints"
+    ]
+}
+
+

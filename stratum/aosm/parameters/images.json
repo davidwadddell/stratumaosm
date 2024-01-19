@@ -1,0 +1,21 @@
+{
+  "images": [
+    {
+      "name": "stratum_fe",
+      "version": "4.1.4"
+    },
+    {
+      "name": "stratum_ems",
+      "version": "4.1.4"
+    },
+    {
+      "name": "pytest",
+      "version": "4.1.4"
+    },
+    {
+      "name": "rhel7",
+      "version": "latest"
+    }    
+  ]
+}
+

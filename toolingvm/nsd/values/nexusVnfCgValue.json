@@ -1,0 +1,39 @@
+{
+    "nexusVnfConfig": {
+        "publisherName": "EneaPublisher",
+        "networkFunctionDefinitionGroupName": "EneaToolingVMnfdg",
+        "networkFunctionDefinitionOfferingLocation": "eastus",
+        "networkFunctionDefinitionVersion": "1.0.0",
+        "nfName": "EneaToolingVMVnf",
+        "vmName": "EneaToolingVM",
+        "cloudServicesNetworkAttachment": {
+            "attachedNetworkId": "/subscriptions/d86da6b7-31a4-48f7-8bc1-2a643f539ca7/resourceGroups/rg-precert-ENEA-AODS-OnPrem/providers/Microsoft.NetworkCloud/cloudServicesNetworks/csn-enea",
+            "defaultGateway": "False",
+            "ipAllocationMethod": "Dynamic",
+            "networkAttachmentName": "fxp0"
+        },
+        "networkAttachments": [
+            {
+                "attachedNetworkId": "/subscriptions/d86da6b7-31a4-48f7-8bc1-2a643f539ca7/resourceGroups/rg-precert-ENEA-AODS-OnPrem/providers/Microsoft.NetworkCloud/l3Networks/l3-wnet-enea",
+                "defaultGateway": "True",
+                "ipAllocationMethod": "Dynamic",
+                "networkAttachmentName": "ge0-0-0"
+            }
+        ],
+        "cpuCores": 4,
+        "memorySizeGB": 32,
+        "sshPublicKeys": [
+            {
+                "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4OnqaETA221rrHuHbofjz6RjkPNv8w5zRIWWiG0WVX5Oed2d1wRUTU41eP3uU8lA2AMzdCwXTfn4CSKjSOs0xiHJ3EYwrH5fsXRDhPMCiWH19vnAkE7V/FnIMHXTQbM3ps8YfKkYxD0tQO8td9O30PpJyxaSDHZKEXZxH3WsHKgbKmMrn19QYDfIU9HP43ouzTviFMFOALmiT/2gQYhC1ucRL+il0gblYk9oJ6Gawp3BNviTyKOgEZOBvCPiv1HCiU8YDGSPNoURTd7vS6rPQCvykTASujImpVB7FtZB1exw7qv7HE0CRNW+xFIlTMvrBHtOtPSqj/Yq1cUQT9aXZ"
+            }
+        ],
+        "storageProfile": {
+            "osDisk": {
+                "diskSizeGB": 30
+            }
+        },
+        "userData": "",
+        "networkData": "",
+        "placementHints": []
+    }
+}
