@@ -24,6 +24,10 @@
             "type": "object",
             "properties": {
                 "image": { "type": "string" },
+                "cpu_request": { "type": "string" },
+                "cpu_limit": { "type": "string" },
+                "mem_request": { "type": "string" },
+                "mem_limit": { "type": "string" },		
                 "optopwv_vol_request": { "type": "string" },
                 "varoptopwv_vol_request": { "type": "string" },
                 "ordb_vol_request": { "type": "string" },
@@ -38,6 +42,10 @@
             "type": "object",
             "properties": {
                 "image": { "type": "string" },
+                "cpu_request": { "type": "string" },
+                "cpu_limit": { "type": "string" },
+                "mem_request": { "type": "string" },
+                "mem_limit": { "type": "string" },
                 "optopwv_vol_request": { "type": "string" },
                 "varoptopwv_vol_request": { "type": "string" },
                 "ordb_vol_request": { "type": "string" },
@@ -114,7 +122,6 @@
                         "cpu_limit": { "type": "string" },
                         "mem_request": { "type": "string" },
                         "mem_limit": { "type": "string" },
-                        "ddm_vol_request": { "type": "string" },
                         "otherRegionCSMs": {
                             "type": "array",
                             "items": {

@@ -28,8 +28,8 @@ auth_token = os.environ["auth_token"]
 subscription = os.environ["subscription"]
 rg = os.environ["resourceGroup"]
 
-# Read parameters files
-params = os.path.join(os.getcwd(), 'parameters/stratum.aosm.publisher.part1.parameters.json')
+# Read parameters file
+params = os.path.join(os.getcwd(), 'parameters/stratum.aosm.names.parameters.json')
 with open(params, 'r') as file:
     content = json.load(file)
     names = content['parameters']
@@ -63,12 +63,15 @@ def get_credentials(url):
     }
 
     # Get credentials
-    response = requests.post(url, headers=headers, data={})
+    response = requests.post(url, headers=headers, data={},verify=False)
+
+    print(vars(response))
 
     # Check if response is 200
     if (response.status_code != 200):
         print("Error getting credentials")
-        print(response.json())
+#        print(response.json())
+        print(vars(response))
         os._exit()
 
     # Get credentials from response

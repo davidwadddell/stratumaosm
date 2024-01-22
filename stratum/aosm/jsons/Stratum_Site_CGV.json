@@ -1,7 +1,7 @@
 {
     "global": {
         "site": "site1",
-        "imagesRegistry": "eneapublishereneaartifactstoreefdd192993.azurecr.io",        
+        "imagesRegistry": "eneapublishereneaartifactstore417a4a2632.azurecr.io",        
         "imagePullSecrets": [ ],
         "ssh_Secrets": "",
         "id_rsa_pub_key": "c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFCQVFDNXM0ZFhzQTFVS01DWlVBUGRUcjg5Q0pJbzBVWkQ3eUFObTFqU2JTZGxqYm1oWE1tNmpNZzZRZXg2U0ZtcmIwNmg1Uk5jREs4dkxwQ2VHOXFkd05QbnZFMWZjSC9UUTFraUx6aEhvZVF6TGU1dW1Yb0RlN1JtK1V1b1kxQ2JMOHdVaGJpVnJtZEE0MGl3OTRDcHRzWDRZQXlGNkJHeERUZHl1VGJIdTRobzBPVVVlQSt1SGJTWEo1aGFOemJqZG5YMStxOGpXaUJUSHRaWWJHQVR2OTZnVmRDVkNvdFBZRm04V2NYeE5WNXBnemVOejBINTZqZ2ZzS0pDUXE1RnQwLzhzRXp4Q2lzVEhEempHK3ZpcFU1MEdCUkdMMVgvVkVsY2RQWDNJVzdCakZIeWtXdTEwNHV1NVVxNkV5TnE1Si9qOUt5bDBxZkxvdEZNakYxZnZibk4gcm9vdEBlbXMwMQo=",
@@ -10,9 +10,13 @@
     },
     "ems01": {
         "image": "",
+        "mem_request": "32Gi",
+        "mem_limit": "32Gi",
+        "cpu_request": "4",
+        "cpu_limit": "4",	
         "optopwv_vol_request": "5Gi",
         "varoptopwv_vol_request": "5Gi",
-        "ordb_vol_request": "5Gi",
+        "ordb_vol_request": "50Gi",
         "toolsreportingrepo_vol_request": "5Gi",
         "remotenotify_vol_request": "5Gi",
         "standard_cli_script": "5Gi",
@@ -21,66 +25,65 @@
     },
     "ems02": {
         "image": "",
+	"mem_request": "32Gi",
+        "mem_limit": "32Gi",
+        "cpu_request": "4",
+        "cpu_limit": "4",	
         "optopwv_vol_request": "5Gi",
         "varoptopwv_vol_request": "5Gi",
-        "ordb_vol_request": "5Gi",
+        "ordb_vol_request": "50Gi",
         "toolsreportingrepo_vol_request": "5Gi",
         "remotenotify_vol_request": "5Gi",
         "node_selector": ""
     },
     "regions": {
         "site": "site1",        
-        "init_container_image": "eneapublishereneaartifactstorea3d88639a2.azurecr.io/rhel7:latest",
+        "init_container_image": "eneapublishereneaartifactstore417a4a2632.azurecr.io/rhel7:latest",
         "regionsToDeploy": [ "region1", "region2" ],
         "regions": [
             {
                 "name": "region1",
-                "affinities": {
-                    "requiredAffinity": "topology.kubernetes.io/zone In \"1\",\"2\""
+		"affinities": {
+                    "requiredAffinity": "topology.kubernetes.io/zone In \"1\",\"6\",\"3\",\"4\""
                 },
-                "csmLoadBalancerIPs": [ "10.100.66.21" ]
+                "csmLoadBalancerIPs": [ "108.153.195.193" ]
             },
             {
                 "name": "region2",
-                "affinities": {
-                    "requiredAffinity": "topology.kubernetes.io/zone In \"3\",\"4\""
+		 "affinities": {
+                    "requiredAffinity": "topology.kubernetes.io/zone In \"5\",\"2\",\"7\",\"8\""
                 },
-                "csmLoadBalancerIPs": [ "10.100.66.22" ]
+                "csmLoadBalancerIPs": [ "108.153.195.194" ]
             }
         ],
-        "process_pinning_enabled" : "false",
+        "process_pinning_enabled" : "true",
         "ild": {
             "image": "",
-            "replicas": "2",
-            "cpu_request": "4",
-            "cpu_limit": "4",
-            "mem_request": "1024Mi",
-            "mem_limit": "4096Mi",
+            "replicas": "57",
+            "cpu_request": "6",
+            "cpu_limit": "6",
+            "mem_request": "8Gi",
+            "mem_limit": "8Gi",
             "node_selector": ""
         },
         "adm": {
             "image": "",
-            "replicas": "3",
-            "cpu_request": "4",
-            "cpu_limit": "4",
-            "mem_request": "1024Mi",
-            "mem_limit": "8092Mi",
-            "ddm_vol_request": "5Gi",
+            "replicas": "46",
+            "cpu_request": "6",
+            "cpu_limit": "6",
+            "mem_request": "80Gi",
+            "mem_limit": "80Gi",
+            "ddm_vol_request": "200Gi",
             "node_selector": ""            
         },
         "csm": {
             "image": "",
-            "replicas": "1",
-            "cpu_request": "1",
-            "cpu_limit": "2",
-            "mem_request": "1024Mi",
-            "mem_limit": "4046Mi",
-            "ddm_vol_request": "5Gi",
+            "replicas": "40",
+            "cpu_request": "6",
+            "cpu_limit": "6",
+            "mem_request": "8Gi",
+            "mem_limit": "8Gi",
             "otherRegionCSMs": [
-                {
-                    "ip": "10.100.66.22", 
-                    "hostname": "site1-region2-stratum-csm-0.stratum-nodes.stratum.svc.cluster.local"
-                }
             ],
             "node_selector": ""
         }
