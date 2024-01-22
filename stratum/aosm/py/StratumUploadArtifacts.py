@@ -28,8 +28,8 @@ auth_token = os.environ["auth_token"]
 subscription = os.environ["subscription"]
 rg = os.environ["resourceGroup"]
 
-# Read parameters file
-params = os.path.join(os.getcwd(), 'parameters/stratum.aosm.names.parameters.json')
+# Read parameters files
+params = os.path.join(os.getcwd(), 'parameters/stratum.aosm.publisher.part1.parameters.json')
 with open(params, 'r') as file:
     content = json.load(file)
     names = content['parameters']
@@ -63,15 +63,12 @@ def get_credentials(url):
     }
 
     # Get credentials
-    response = requests.post(url, headers=headers, data={},verify=False)
-
-    print(vars(response))
+    response = requests.post(url, headers=headers, data={})
 
     # Check if response is 200
     if (response.status_code != 200):
         print("Error getting credentials")
-#        print(response.json())
-        print(vars(response))
+        print(response.json())
         os._exit()
 
     # Get credentials from response
@@ -102,7 +99,7 @@ if sys.argv[1] == "all" or sys.argv[1] == "helm":
     ]
     output = subprocess.check_output(command)
     print(output.decode("utf-8"))
-    
+
     # Generate oci url
     oci = "oci" + acr_cred["acrServerUrl"].replace("https", "")
     print(oci)
@@ -126,7 +123,7 @@ if sys.argv[1] == "all" or sys.argv[1] == "helm":
     # Load images data from parameters file
     with open(os.path.join(os.getcwd(), 'parameters/stratum-images.json'), 'r') as file:
         images = json.load(file)
-    
+
     # Push images
     for image in images["images"]:
 
@@ -146,7 +143,7 @@ if sys.argv[1] == "all" or sys.argv[1] == "helm":
         output = subprocess.check_output(docker_push_command)
         print(output.decode("utf-8"))
         print ('Pushed image ', docker_image)
-    
+
 if sys.argv[1] == "all" or sys.argv[1] == "oras":
 
     # Login to oras registry
