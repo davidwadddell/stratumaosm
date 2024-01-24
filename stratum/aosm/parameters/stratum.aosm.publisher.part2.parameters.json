@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "publisherName": {
-            "value": "EneaPublisher1"
+            "value": "EneaPublisher"
         },
         "artifactStore": {
-            "value": "EneaArtifactStore1"
+            "value": "EneaArtifactStore"
         },
         "nfdgroupName": {
             "value": "StratumNFDG"

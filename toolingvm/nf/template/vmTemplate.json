@@ -4,7 +4,7 @@
     "parameters": {
         "location":{
             "type": "string",
-            "defaultValue": "eastus"
+            "defaultValue": "westus3"
         },
         "networkAttachments": {
             "type": "array"
@@ -74,7 +74,7 @@
         {
         "name": "[parameters('virtualMachineName')]",
         "type": "Microsoft.NetworkCloud/virtualMachines",
-        "apiVersion": "2022-12-12-preview",
+        "apiVersion": "2023-07-01",
         "location": "[parameters('location')]",
         "extendedLocation": {
             "name": "[parameters('extendedLocationResourceId')]",

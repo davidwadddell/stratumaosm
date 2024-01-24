@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "value": "eastus"
+      "value": "westus3"
     },
     "nfviFromSite": {
       "value": "nexus-vnf-nfvi"
     },
     "customlocationId": {
-      "value": "/subscriptions/d86da6b7-31a4-48f7-8bc1-2a643f539ca7/resourcegroups/pct1-a5c20be9907d-hostedresources-79383a1a/providers/microsoft.extendedlocation/customlocations/pct1-a5c20be9907d-cstm-loc"
+      "value": "/subscriptions/291aba08-0b74-43b8-b543-678275bda3f7/resourceGroups/adp-nprd-usw3-rd2wa25-cls-mrg/providers/Microsoft.ExtendedLocation/customLocations/adp-nprd-usw3-rd2wa25-cls-cstm-loc"
     },
     "nsdVersion": {
       "value": "1.0.0"

@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "publisherName": {
-            "value": "EneaPublisher1"
+            "value": "EneaPublisher"
         },
         "nsdGroup": {
             "value": "StratumNSDG"
@@ -24,10 +24,10 @@
             "value": "StratumSNS"
         },
         "aksClusterName": {
-            "value": "enea-naks-cluster-cl"
+            "value": "udr1-rd2wa25-naks-1-cl"
         },
         "aksClusterGroup": {
-            "value": "rg-precert-ENEA-001"
+            "value": "mob-udr-rd2wa25-cpn-mnl-rg-1"
         }
     }
 }

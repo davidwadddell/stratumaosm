@@ -2,29 +2,29 @@
     "nexusVnfConfig": {
         "publisherName": "EneaPublisher",
         "networkFunctionDefinitionGroupName": "EneaToolingVMnfdg",
-        "networkFunctionDefinitionOfferingLocation": "eastus",
+        "networkFunctionDefinitionOfferingLocation": "westus3",
         "networkFunctionDefinitionVersion": "1.0.0",
         "nfName": "EneaToolingVMVnf",
         "vmName": "EneaToolingVM",
         "cloudServicesNetworkAttachment": {
-            "attachedNetworkId": "/subscriptions/d86da6b7-31a4-48f7-8bc1-2a643f539ca7/resourceGroups/rg-precert-ENEA-AODS-OnPrem/providers/Microsoft.NetworkCloud/cloudServicesNetworks/csn-enea",
+            "attachedNetworkId": "/subscriptions/291aba08-0b74-43b8-b543-678275bda3f7/resourceGroups/mob-udr-rd2wa25-cpn-mnl-rg-1/providers/Microsoft.NetworkCloud/cloudServicesNetworks/cudr-rd2wa25-csn-mnll2net-01",
             "defaultGateway": "False",
             "ipAllocationMethod": "Dynamic",
             "networkAttachmentName": "fxp0"
         },
         "networkAttachments": [
             {
-                "attachedNetworkId": "/subscriptions/d86da6b7-31a4-48f7-8bc1-2a643f539ca7/resourceGroups/rg-precert-ENEA-AODS-OnPrem/providers/Microsoft.NetworkCloud/l3Networks/l3-wnet-enea",
+                "attachedNetworkId": "/subscriptions/291aba08-0b74-43b8-b543-678275bda3f7/resourceGroups/mob-udr-rd2wa25-cpn-mnl-rg-1/providers/Microsoft.NetworkCloud/l3Networks/cudr-cni-mnll3net-01",
                 "defaultGateway": "True",
                 "ipAllocationMethod": "Dynamic",
                 "networkAttachmentName": "ge0-0-0"
             }
         ],
         "cpuCores": 4,
-        "memorySizeGB": 32,
+        "memorySizeGB": 16,
         "sshPublicKeys": [
             {
-                "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4OnqaETA221rrHuHbofjz6RjkPNv8w5zRIWWiG0WVX5Oed2d1wRUTU41eP3uU8lA2AMzdCwXTfn4CSKjSOs0xiHJ3EYwrH5fsXRDhPMCiWH19vnAkE7V/FnIMHXTQbM3ps8YfKkYxD0tQO8td9O30PpJyxaSDHZKEXZxH3WsHKgbKmMrn19QYDfIU9HP43ouzTviFMFOALmiT/2gQYhC1ucRL+il0gblYk9oJ6Gawp3BNviTyKOgEZOBvCPiv1HCiU8YDGSPNoURTd7vS6rPQCvykTASujImpVB7FtZB1exw7qv7HE0CRNW+xFIlTMvrBHtOtPSqj/Yq1cUQT9aXZ"
+                "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAz+eHzcAqSzC/e+x4BMjH2Gg3aWMCRXouFtgFouXcEcBT3RrOWKn9mk2txML92LzquHEYYaylnN0oCIe0EWphCQjfDcbhLg8Me8TZtIjrFkkAlUB8n0Xw6cQCH8UNjEr+EZ2RBEf8wIUtzjn/vScpWBNNRr+WWJVyPxzECMhGtzAHjNJNjiX2/0smX7CtkC/vbBHfJfMXyW2UeMD3YbuxjfitPPdrn2SlLuBziJrq3bIBXccuO7S5IYsCGRzx+anOg1qmH7p64RCt8R7Su9ep3vTx6Xp8FcQgV1/jkxWvDjpNn/fYAZxY8/bEzUxAELAhVthnqqiQ5dqf72+JAkEc6w==",
             }
         ],
         "storageProfile": {
