@@ -11,5 +11,7 @@ pool:
 
 steps:
 - script: |
+     hostname
+     id
      az resource list -o table
   displayName: 'az test'
