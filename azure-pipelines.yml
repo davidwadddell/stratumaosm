@@ -11,7 +11,6 @@ pool:
 
 steps:
 - script: |
-     hostname
-     id
-     az resource list -o table
-  displayName: 'az test'
+     pushd /home/dw0647/stratumaosm/stratum/aosm
+     ./deploy_operator.sh
+  displayName: 'deploy'
