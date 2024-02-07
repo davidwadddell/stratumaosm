@@ -11,6 +11,7 @@ pool:
 
 steps:
 - script: |
+     hostname
      pushd /home/dw0647/stratumaosm/stratum/aosm
      ./deploy_operator.sh
   displayName: 'deploy'
