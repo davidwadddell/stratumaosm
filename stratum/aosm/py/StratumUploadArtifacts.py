@@ -79,7 +79,7 @@ def get_credentials(url):
     return credentials
 
 # URL to get credentials
-url = f"https://management.azure.com/subscriptions/{subscription}/resourceGroups/{rg}/providers/Microsoft.Hybridnetwork/publishers/{publisher}/artifactStores/{artifactStore}/artifactManifests/{artifactManifest}/listcredential?api-version=2023-04-01-preview"
+url = f"https://management.azure.com/subscriptions/{subscription}/resourceGroups/{rg}/providers/Microsoft.Hybridnetwork/publishers/{publisher}/artifactStores/{artifactStore}/artifactManifests/{artifactManifest}/listcredential?api-version=2023-09-01"
 print ("URL: " + url + "\n")
 
 # Get credentials
@@ -99,7 +99,7 @@ if sys.argv[1] == "all" or sys.argv[1] == "helm":
     ]
     output = subprocess.check_output(command)
     print(output.decode("utf-8"))
-
+    
     # Generate oci url
     oci = "oci" + acr_cred["acrServerUrl"].replace("https", "")
     print(oci)
@@ -123,7 +123,7 @@ if sys.argv[1] == "all" or sys.argv[1] == "helm":
     # Load images data from parameters file
     with open(os.path.join(os.getcwd(), 'parameters/stratum-images.json'), 'r') as file:
         images = json.load(file)
-
+    
     # Push images
     for image in images["images"]:
 
@@ -143,7 +143,7 @@ if sys.argv[1] == "all" or sys.argv[1] == "helm":
         output = subprocess.check_output(docker_push_command)
         print(output.decode("utf-8"))
         print ('Pushed image ', docker_image)
-
+    
 if sys.argv[1] == "all" or sys.argv[1] == "oras":
 
     # Login to oras registry

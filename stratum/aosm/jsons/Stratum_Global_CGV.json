@@ -1,22 +1,26 @@
 {
     "global": {
-      "imagePullPolicy": "Always",
+      "imagePullPolicy": "IfNotPresent",
       "storageClass": "nexus-volume",
       "ildService": {
         "loadBalancerIPs": [
-          "108.153.195.192"
+          "10.101.65.11",
+          "10.101.65.12"
         ]
       },
       "timezone": "UTC",
       "emsServices": {
         "loadBalancerIPs": {
           "ems01": [
-            "166.193.254.192"
+            "10.101.65.1"
           ],
           "ems02": [
-            "166.193.254.193"
+            "10.101.65.2"
           ]
         }
-      }
+      },
+      "daemonset": {
+        "image": "eneapublishereneaartifactstorea3d88639a2.azurecr.io/rhel7:latest"
+      }      
     }
   }

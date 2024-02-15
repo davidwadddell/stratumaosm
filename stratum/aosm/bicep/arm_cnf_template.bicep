@@ -3,6 +3,7 @@ param nfdgroupName string = 'TestNFDGroup'
 param nfdversion string = '1.0.0'
 param location string = resourceGroup().location
 param nfvId string = '/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/aosm-demo/providers/microsoft.extendedlocation/customlocations/aosmcluster-custom-location'
+param nfdvId string = '/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/aosm-demo/providers/microsoft.hybridnetwork/publishers/{publisherName}/networkFunctionDefinitionGroups/{nfdg}/networkFunctionDefinitionVersions/{nfdv}'
 param charts array
 param cnfName string
 
@@ -23,18 +24,18 @@ var vals = {
 // The deploymentValues property is an array of objects, one per subchart which is being deployed
 // This allows the Helm chats to be deployed with different values
 //
-resource cnf 'Microsoft.HybridNetwork/networkFunctions@2023-04-01-preview' = {
+resource cnf 'Microsoft.HybridNetwork/networkFunctions@2023-09-01' = {
   name: cnfName
   location: location
   identity: {
    type: 'SystemAssigned'
   }
   properties: {
-    publisherName: publisherName
-    publisherScope: 'Private'
-    networkFunctionDefinitionGroupName: nfdgroupName
-    networkFunctionDefinitionOfferingLocation: location
-    networkFunctionDefinitionVersion: nfdversion
+    configurationType: 'Open'
+    networkFunctionDefinitionVersionResourceReference: {
+      id: nfdvId
+      idType: 'Open'
+    }
     nfviType: 'AzureArcKubernetes'
     nfviId:nfvId 
     allowSoftwareUpdate: true

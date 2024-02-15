@@ -14,11 +14,51 @@
                         "ems01": "{configurationparameters('StratumGlobalConfiguration').global.emsServices.loadBalancerIPs.ems01}",
                         "ems02": "{configurationparameters('StratumGlobalConfiguration').global.emsServices.loadBalancerIPs.ems02}"
                     }
+                },
+                "daemonset": {
+                    "image": "{configurationparameters('StratumGlobalConfiguration').global.daemonset.image}",
+                    "imagePullSecrets": "{configurationparameters('StratumSiteConfiguration').global.imagePullSecrets}"
+                },
+                "geoRegion": "{configurationparameters('StratumSiteConfiguration').global.geoRegion}",
+                "partitioning": {
+                    "partitions": "{configurationparameters('StratumSiteConfiguration').global.partitioning.partitions}",
+                    "sites": "{configurationparameters('StratumSiteConfiguration').global.partitioning.sites}"
                 }
             }
         },
-        "Version": "4.2.5-GA"
+        "Version": "4.3.0"
     },
+    {
+        "Values": {
+            "tags": {
+                "deployHAProxy": "true"
+            },
+            "haproxy-ingress": {
+                "controller": {
+                    "image": {
+                        "repository": "{configurationparameters('StratumSiteConfiguration').haproxy-ingress.controller.image.repository}",
+                        "tag": "{configurationparameters('StratumSiteConfiguration').haproxy-ingress.controller.image.tag}"                      
+                    },
+                    "service": {
+                        "loadBalancerIP": "{configurationparameters('StratumSiteConfiguration').haproxy-ingress.controller.service.loadBalancerIP}"
+                    },
+                    "haproxy": {
+                        "image": {
+                            "repository": "{configurationparameters('StratumSiteConfiguration').haproxy-ingress.controller.haproxy.image.repository}",
+                            "tag": "{configurationparameters('StratumSiteConfiguration').haproxy-ingress.controller.haproxy.image.tag}"
+                        }
+                    },
+                    "logs": {
+                        "image": {
+                            "repository": "{configurationparameters('StratumSiteConfiguration').haproxy-ingress.controller.logs.image.repository}",
+                            "tag": "{configurationparameters('StratumSiteConfiguration').haproxy-ingress.controller.logs.image.tag}"
+                        }
+                    }                     
+                }
+            }
+        },
+        "Version": "4.3.0"
+    },  
     {
         "Values": {     
             "tags": {               
@@ -33,10 +73,6 @@
             },
             "ems01": {
                 "image": "{configurationparameters('StratumSiteConfiguration').ems01.image}",               
-                "cpu_request": "{configurationparameters('StratumSiteConfiguration').regions.adm.cpu_request}",
-                "cpu_limit": "{configurationparameters('StratumSiteConfiguration').regions.adm.cpu_limit}",
-                "mem_request": "{configurationparameters('StratumSiteConfiguration').regions.adm.mem_request}",
-                "mem_limit": "{configurationparameters('StratumSiteConfiguration').regions.adm.mem_limit}",
                 "optopwv_vol_request": "{configurationparameters('StratumSiteConfiguration').ems01.optopwv_vol_request}",
                 "varoptopwv_vol_request": "{configurationparameters('StratumSiteConfiguration').ems01.varoptopwv_vol_request}",
                 "ordb_vol_request": "{configurationparameters('StratumSiteConfiguration').ems01.ordb_vol_request}",
@@ -47,7 +83,7 @@
                 "node_selector": "{configurationparameters('StratumSiteConfiguration').ems01.node_selector}"
             }
         },        
-        "Version": "4.2.5-GA"        
+        "Version": "4.3.0"        
     },
     {
         "Values": {
@@ -63,10 +99,6 @@
             },
             "ems02": {
                 "image": "{configurationparameters('StratumSiteConfiguration').ems02.image}",
-                "cpu_request": "{configurationparameters('StratumSiteConfiguration').regions.adm.cpu_request}",
-                "cpu_limit": "{configurationparameters('StratumSiteConfiguration').regions.adm.cpu_limit}",
-                "mem_request": "{configurationparameters('StratumSiteConfiguration').regions.adm.mem_request}",
-                "mem_limit": "{configurationparameters('StratumSiteConfiguration').regions.adm.mem_limit}",
                 "optopwv_vol_request": "{configurationparameters('StratumSiteConfiguration').ems02.optopwv_vol_request}",
                 "varoptopwv_vol_request": "{configurationparameters('StratumSiteConfiguration').ems02.varoptopwv_vol_request}",
                 "ordb_vol_request": "{configurationparameters('StratumSiteConfiguration').ems02.ordb_vol_request}",
@@ -75,7 +107,7 @@
                 "node_selector": "{configurationparameters('StratumSiteConfiguration').ems02.node_selector}"
             }
         },        
-        "Version": "4.2.5-GA"  
+        "Version": "4.3.0"  
     },
     {
         "Values": {
@@ -136,12 +168,39 @@
                     "cpu_limit": "{configurationparameters('StratumSiteConfiguration').regions.csm.cpu_limit}",
                     "mem_request": "{configurationparameters('StratumSiteConfiguration').regions.csm.mem_request}",
                     "mem_limit": "{configurationparameters('StratumSiteConfiguration').regions.csm.mem_limit}",
+                    "ddm_vol_request": "{configurationparameters('StratumSiteConfiguration').regions.csm.ddm_vol_request}",
                     "otherRegionCSMs": "{configurationparameters('StratumSiteConfiguration').regions.csm.otherRegionCSMs}",
                     "node_selector": "{configurationparameters('StratumSiteConfiguration').regions.csm.node_selector}"
                 }
             }
         },        
-        "Version": "4.2.5-GA"         
+        "Version": "4.3.0"         
+    },
+    {
+        "Values": {
+            "tags": {
+                "deployNrfClient": "true"
+            },
+            "global": {
+                "imagesRegistry": "{configurationparameters('StratumSiteConfiguration').global.imagesRegistry}"
+            },
+            "stratum_client": {
+                "poll_interval": "{configurationparameters('StratumSiteConfiguration').stratum_client.poll_interval}",
+                "request_timeout": "{configurationparameters('StratumSiteConfiguration').stratum_client.request_timeout}",
+                "request_retries": "{configurationparameters('StratumSiteConfiguration').stratum_client.request_retries}"
+            },
+            "nrf_client": {
+                "poll_interval": "{configurationparameters('StratumSiteConfiguration').nrf_client.poll_interval}",
+                "request_timeout": "{configurationparameters('StratumSiteConfiguration').nrf_client.request_timeout}",
+                "retry_interval": "{configurationparameters('StratumSiteConfiguration').nrf_client.retry_interval}",
+                "request_retries": "{configurationparameters('StratumSiteConfiguration').nrf_client.request_retries}",
+                "heartbeat_timer_multiplier": "{configurationparameters('StratumSiteConfiguration').nrf_client.heartbeat_timer_multiplier}",
+                "on_stratum_stale": "{configurationparameters('StratumSiteConfiguration').nrf_client.on_stratum_stale}",
+                "nrfs": "{configurationparameters('StratumSiteConfiguration').nrf_client.nrfs}",
+                "profiles": "{configurationparameters('StratumSiteConfiguration').nrf_client.profiles}"
+            }
+        },
+        "Version": "4.3.0"
     },
     {
         "Values": {
@@ -155,7 +214,7 @@
                 "imagePullPolicy": "{configurationparameters('StratumGlobalConfiguration').global.imagePullPolicy}"
             }
         },        
-        "Version": "4.2.5-GA"
+        "Version": "4.3.0"
     }
 ]
 

@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "https://json-schema.org/07/schema#",
     "type": "object",
     "title": "GeneratedFromValuesYaml",
     "properties": {
@@ -17,17 +17,80 @@
                 "ssh_Secrets": { "type": "string" },
                 "id_rsa_pub_key": { "type": "string" },
                 "id_rsa_key": { "type": "string" },
-                "id_dsa_key": { "type": "string" }
+                "id_dsa_key": { "type": "string" },
+                "geoRegion": { "type": "string" },
+                "partitioning": {
+                    "type": "object",
+                    "properties": {
+                        "partitions": {
+                            "type": "object",
+                            "additionalProperties": true
+                        },
+                        "sites": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": { "type": "string" },
+                                    "ingress_ip": { "type": "string" }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },       
+        "haproxy-ingress": {
+            "type": "object",
+            "properties": {
+                "controller": {
+                    "type": "object",
+                    "properties": {
+                        "image": {
+                            "type": "object",
+                            "properties": {
+                                "repository": { "type": "string" },
+                                "tag": { "type": "string" }
+                            }
+                        },
+                        "service": {
+                            "type": "object",
+                            "properties": {
+                                "loadBalancerIP": { "type": "string" }
+                            }
+                        },
+                        "haproxy": {
+                            "type": "object",
+                            "properties": {
+                                "image": {
+                                    "type": "object",
+                                    "properties": {
+                                        "repository": { "type": "string" },
+                                        "tag": { "type": "string" }
+                                    }
+                                }
+                            }
+                        },
+                        "logs": {
+                            "type": "object",
+                            "properties": {
+                                "image": {
+                                    "type": "object",
+                                    "properties": {
+                                        "repository": { "type": "string" },
+                                        "tag": { "type": "string" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "ems01": {
             "type": "object",
             "properties": {
                 "image": { "type": "string" },
-                "cpu_request": { "type": "string" },
-                "cpu_limit": { "type": "string" },
-                "mem_request": { "type": "string" },
-                "mem_limit": { "type": "string" },		
                 "optopwv_vol_request": { "type": "string" },
                 "varoptopwv_vol_request": { "type": "string" },
                 "ordb_vol_request": { "type": "string" },
@@ -42,10 +105,6 @@
             "type": "object",
             "properties": {
                 "image": { "type": "string" },
-                "cpu_request": { "type": "string" },
-                "cpu_limit": { "type": "string" },
-                "mem_request": { "type": "string" },
-                "mem_limit": { "type": "string" },
                 "optopwv_vol_request": { "type": "string" },
                 "varoptopwv_vol_request": { "type": "string" },
                 "ordb_vol_request": { "type": "string" },
@@ -122,6 +181,7 @@
                         "cpu_limit": { "type": "string" },
                         "mem_request": { "type": "string" },
                         "mem_limit": { "type": "string" },
+                        "ddm_vol_request": { "type": "string" },
                         "otherRegionCSMs": {
                             "type": "array",
                             "items": {
@@ -136,7 +196,57 @@
                     }
                 }
             }
-        }
+        },
+        "stratum_client": {
+            "type": "object",
+            "properties": {
+                "poll_interval": { "type": "string" },
+                "request_timeout": { "type": "string" },
+                "request_retries": { "type": "string" }
+            }
+        },
+        "nrf_client": {
+            "type": "object",
+            "properties": {
+                "poll_interval": { "type": "string" },
+                "request_timeout": { "type": "string" },
+                "retry_interval": { "type": "string" },
+                "request_retries": { "type": "string" },
+                "heartbeat_timer_multiplier": { "type": "string" },
+                "on_stratum_stale": { "type": "string" },
+                "nrfs": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": { "type": "string" },
+                            "geo_region": { "type": "string" },
+                            "endpoints" : {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "profiles": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "profiles": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": { "type": "string" },
+                            "json": { "type": "string" }
+                        }
+                    }
+                }
+            }  
+        }   
     }
 }
-                

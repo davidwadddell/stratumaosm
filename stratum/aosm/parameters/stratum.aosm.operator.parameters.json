@@ -17,6 +17,18 @@
         "siteCgvName": {
             "value": "StratumSiteCGV"
         },
+        "globalCgsName": {
+            "value": "StratumGlobalConfiguration"
+        },
+        "siteCgsName": {
+            "value": "StratumSiteConfiguration"
+        },
+        "nfdgroupName": {
+            "value": "StratumNFDG"
+        },
+        "nfdversion": {
+            "value": "1.0.0"
+        },
         "siteName": {
             "value": "StratumSite"
         },
@@ -24,10 +36,10 @@
             "value": "StratumSNS"
         },
         "aksClusterName": {
-            "value": "udr1-rd2wa25-naks-1-cl"
+            "value": "enea-naks-cluster-cl"
         },
         "aksClusterGroup": {
-            "value": "mob-udr-rd2wa25-cpn-mnl-rg-1"
+            "value": "rg-precert-ENEA-001"
         }
     }
 }

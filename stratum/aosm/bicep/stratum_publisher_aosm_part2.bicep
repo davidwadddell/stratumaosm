@@ -9,12 +9,12 @@ param nfdversion string
 param resourceExists bool = false
 
 // Publisher resource
-resource publisher 'Microsoft.HybridNetwork/publishers@2023-04-01-preview' existing = {
+resource publisher 'Microsoft.HybridNetwork/publishers@2023-09-01' existing = {
   name: publisherName
 }
 
 // Artifact store resource
-resource acrArtifactStore 'Microsoft.HybridNetwork/publishers/artifactStores@2023-04-01-preview' existing = {
+resource acrArtifactStore 'Microsoft.HybridNetwork/publishers/artifactStores@2023-09-01' existing = {
   parent: publisher
   name: artifactStore
 }
@@ -23,13 +23,13 @@ resource acrArtifactStore 'Microsoft.HybridNetwork/publishers/artifactStores@202
 var helm_charts = loadJsonContent('../parameters/stratum-helm-charts.json')
 
 // Create NFD group resource
-resource nfd 'Microsoft.HybridNetwork/publishers/networkfunctiondefinitiongroups@2022-09-01-preview' existing = {
+resource nfd 'Microsoft.HybridNetwork/publishers/networkfunctiondefinitiongroups@2023-09-01' existing = {
   name: nfdgroupName
   parent: publisher
 }
 
 // Create NSDG group resource 
-resource nsdg 'Microsoft.Hybridnetwork/publishers/networkservicedesigngroups@2023-04-01-preview' existing = {
+resource nsdg 'Microsoft.Hybridnetwork/publishers/networkservicedesigngroups@2023-09-01' existing = {
   parent: publisher
   name: nsdGroup
 }
@@ -71,7 +71,7 @@ var nFAs = [for (hchart, index) in helm_charts.charts: {
 // The "deployParameters" property is used to define the parameters for the NFD ARM template (using schema defined above)
 // The "networkFunctionApplications" property is used to define the NFAs for each Helm chart
 //
-resource nfdv 'Microsoft.HybridNetwork/publishers/networkfunctiondefinitiongroups/networkfunctiondefinitionversions@2023-04-01-preview' = {
+resource nfdv 'Microsoft.HybridNetwork/publishers/networkfunctiondefinitiongroups/networkfunctiondefinitionversions@2023-09-01' = {
   parent: nfd
   name: nfdversion
   location: location
@@ -86,7 +86,7 @@ resource nfdv 'Microsoft.HybridNetwork/publishers/networkfunctiondefinitiongroup
 }
 
 // Create global configuration group schema resource from JSON file
-resource globalCnfSchema 'Microsoft.Hybridnetwork/publishers/configurationGroupSchemas@2023-04-01-preview' = {
+resource globalCnfSchema 'Microsoft.Hybridnetwork/publishers/configurationGroupSchemas@2023-09-01' = {
   parent: publisher
   name: 'StratumGlobalConfiguration'
   location: location
@@ -96,7 +96,7 @@ resource globalCnfSchema 'Microsoft.Hybridnetwork/publishers/configurationGroupS
 }
 
 // Create site configuration group schema resource from JSON file
-resource siteCnfSchema 'Microsoft.Hybridnetwork/publishers/configurationGroupSchemas@2023-04-01-preview' = {
+resource siteCnfSchema 'Microsoft.Hybridnetwork/publishers/configurationGroupSchemas@2023-09-01' = {
   parent: publisher
   name: 'StratumSiteConfiguration'
   location: location
@@ -123,7 +123,7 @@ var chartsString = string(loadJsonContent('../jsons/Stratum_NSDG_config_mapping.
 // The key configuration is the "charts" property which is used to define the configuration for the Helm charts for the NFD
 //
 
-resource nsdg_1_0_0 'Microsoft.Hybridnetwork/publishers/networkservicedesigngroups/networkservicedesignversions@2023-04-01-preview' = {
+resource nsdg_1_0_0 'Microsoft.Hybridnetwork/publishers/networkservicedesigngroups/networkservicedesignversions@2023-09-01' = {
   parent: nsdg
   name: nsdvName
   location: location
@@ -150,7 +150,7 @@ resource nsdg_1_0_0 'Microsoft.Hybridnetwork/publishers/networkservicedesigngrou
         type: 'NetworkFunctionDefinition'
         configuration: {
           templateType: 'ArmTemplate'
-          parameterValues: '{"publisherName": "${publisherName}", "nfdgroupName": "${nfdgroupName}", "nfdversion": "${nfdversion}", "charts": ${chartsString}, "nfvId": "{nfvis(\'naksCluster\').customLocationReference.id}", "cnfName": "${cnfName}"}'
+          parameterValues: '{"publisherName": "${publisherName}", "nfdgroupName": "${nfdgroupName}", "nfdvId": "${nfdv.id}", "nfdversion": "${nfdversion}", "charts": ${chartsString}, "nfvId": "{nfvis(\'naksCluster\').customLocationReference.id}", "cnfName": "${cnfName}"}'
           artifactProfile: {
             artifactStoreReference: {
               id: acrArtifactStore.id
