@@ -1,0 +1,4 @@
+addGroupOnlyIfNotExists [CFG_GROUP_ID=1] Complex//Partitioning/GeoRegions/CFG_GROUP_ID:1:GeoRegion:EAST
+addGroupOnlyIfNotExists [CFG_GROUP_ID=1] Complex//Partitioning/GeoRegions/1/UDRSites/CFG_GROUP_ID:1:UDRSiteId:site1
+addList Complex//Partitioning/GeoRegions/1/UDRSites/1/StratumRegions/LON1
+addList Complex//Partitioning/GeoRegions/1/UDRSites/1/StratumRegions/LON2

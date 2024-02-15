@@ -1,0 +1,159 @@
+{
+    "global": {
+        "site": "site1",
+        "imagesRegistry": "eneapublishereneaartifactstoreefdd192993.azurecr.io",        
+        "imagePullSecrets": [ ],
+        "ssh_Secrets": "",
+        "id_rsa_pub_key": "c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFCQVFDNXM0ZFhzQTFVS01DWlVBUGRUcjg5Q0pJbzBVWkQ3eUFObTFqU2JTZGxqYm1oWE1tNmpNZzZRZXg2U0ZtcmIwNmg1Uk5jREs4dkxwQ2VHOXFkd05QbnZFMWZjSC9UUTFraUx6aEhvZVF6TGU1dW1Yb0RlN1JtK1V1b1kxQ2JMOHdVaGJpVnJtZEE0MGl3OTRDcHRzWDRZQXlGNkJHeERUZHl1VGJIdTRobzBPVVVlQSt1SGJTWEo1aGFOemJqZG5YMStxOGpXaUJUSHRaWWJHQVR2OTZnVmRDVkNvdFBZRm04V2NYeE5WNXBnemVOejBINTZqZ2ZzS0pDUXE1RnQwLzhzRXp4Q2lzVEhEempHK3ZpcFU1MEdCUkdMMVgvVkVsY2RQWDNJVzdCakZIeWtXdTEwNHV1NVVxNkV5TnE1Si9qOUt5bDBxZkxvdEZNakYxZnZibk4gcm9vdEBlbXMwMQo=",
+        "id_rsa_key": "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcGdJQkFBS0NBUUVBdWJPSFY3QU5WQ2pBbVZBRDNVNi9QUWlTS05GR1ErOGdEWnRZMG0wblpZMjVvVnpKCnVveklPa0hzZWtoWnEyOU9vZVVUWEF5dkx5NlFuaHZhbmNEVDU3eE5YM0IvMDBOWklpODRSNkhrTXkzdWJwbDYKQTN1MFp2bExxR05RbXkvTUZJVzRsYTVuUU9OSXNQZUFxYmJGK0dBTWhlZ1JzUTAzY3JrMng3dUlhTkRsRkhnUApyaDIwbHllWVdqYzI0M1oxOWZxdkkxb2dVeDdXV0d4Z0U3L2VvRlhRbFFxTFQyQlp2Rm5GOFRWZWFZTTNqYzlCCitlbzRIN0NpUWtLdVJiZFAvTEJNOFFvckV4dzg0eHZyNHFWT2RCZ1VSaTlWLzFSSlhIVDE5eUZ1d1l4UjhwRnIKdGRPTHJ1Vkt1aE1qYXVTZjQvU3NwZEtueTZMUlRJeGRYNzI1elFJREFRQUJBb0lCQVFDcDFXQUZPVFNuY0hIYwpoUXBUdnk0MVFuNXhxQnVNQzhrVHlLeHVIbmYyYjZ5Q3dCcWFheUMvN3dTNFBTME5GY29qVkI3bGc1QkFKV1VMCnhNdW1sUEQ0TWdYTk1GVW5RS1BuR0twdkVNZGthekJ4cEJtcno5b0loeHpEanJqc2hNVXZTN0NwN0F2d2t5MHEKOCtDTzFtS3VLaUdwNGJrMFpMTCtVQmVpaVlkUzI1SEgvUHI3Y0ppNi81OXdHNlZIVC9DaW5qTUFTTWtUb2JGVgpvSUxHSWJ3amc1SzkwRTh4d2VPRGEwSit1OTFMRUdKZWhGNE42NDZidEUwMnRLYlV0N0hVYlN3OVVDRUlmc0lmClphcjYzclkrcXEyQldIeHBEK3E0NC9sMVVMYnBCK2UxNU53UEtPdU1PTk52OTJiMDF0RTlaNDIwMEVDODJlWTkKVzl5b0p4N0JBb0dCQU9qam9QMGJ3Z1dLMUw0eUhhdFZKWlRuLy96Z0RtUkowWTROTmVaWVljZWRLb2d6MnNLOAozYnpIOGdwd05MZWthcXBlSWxDa0lONk5EWHRjanpVRExRWWdpY1lPeDZsR2xURDQ0VThYLzFMMC82K1IvNjRjCndnVWlXcEU0SzByNUZiQWIvQ3FJcjh6TlZVMkNZOGhHMlJrMnkwdnQ2ZCtJVWJXbEdma2NWeEc5QW9HQkFNd2gKSUtrTC9tamUzbGlhOEJpaThkVmFnWmJuY2hWcHBKa0NOeGZXc1RONWFiRVRvN0NQUW04Q05NMjRiR2lBUjg1QQozU0cxZk5OZ1ducUk4TmJiT2pLa055b1pldDBITHlPcm9jRkFpc0RhR01YVWFYck0rckowRVhUdzM1aCtUTWUvCjg3aElGUWRMS1NxNUp4NlRLUFZQcERHOUNnU2RKMHdlSkViSW91RlJBb0dCQU9UaGVnSG5ldXJwZzZZZEtPMk8KOUMyQlNTT2tyR0JCOEZLVWh5bUlLU2orUEtPNW1zRVN6elhPcUFFOFA0TlFjb2hYbFkvOWpsUksram9JUUxKUQpHYnJRMWJheUplWW1lVSswK2ZJNjJuTVVXQW1jQ2xWNjYvQVIwRUt5bWxISHRWbnNWd3NTWlB4NXZPRTlTWVcyCm8zelZUajJrWjlxSlpneUlZNXRoRCsxZEFvR0JBS2ZydUlwWHEzbHBuVThXWmR4ZWJzSXNLZDZSbG0rMjhBaE8Kb2pPaUVUTmU5V3NOMU9JeGQxMEtXNVcvMks0K21OTTYySzRhTmcxTWZpRys5U0JLUjUzUktQQWc5Y2xOVjZIbwpWckE2LyttVmdEdDllU2ZqNTNkVnMrYVhIOWk2VFQ4azBNRVB5dnlzLzdoOWg0akhWakkyeWNPQTF2VGtzcWNUClJKUldDR2VCQW9HQkFPWWRLYUlkWnBhcmJJVUt5NDdjdC9GblRTY09KaEFlQ1VLS3J1OXhRZVNHQWpld3RIWEQKNGpRQlJBRlc1algrU3JYTFJhU0tIei8wMGM4ZDlyMkFmNGgrZ2laT2pUMkhjaG9kbmhVMjJ1ZkxTQzBTMjdrMgp1R0NENzZQNGltdWs5NkJUQjhRWm1NODArekVRYjROUGYyS0tBRkdSTjhINTkyc2h6dnRFaXdQcwotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=",
+        "id_dsa_key": "LS0tLS1CRUdJTiBEU0EgUFJJVkFURSBLRVktLS0tLQpNSUlCdWdJQkFBS0JnUUM2KzNER3Fpd2hyS3NHbTBhT1Z5K3AvbjRqSVZqem9sTTFQN2YwOU85bGt6WVpWeUZxCkp1cS9sUktFd1d1MzFPU0tVaWtCTnlxOWlpOHJpdWs4QUE4VlZwZEhKY3prTEovVXovOGFFRkhFdkowR1RKTGsKZWcrLzFnM2svQUdWMTE0QzZ1MjRlbVUyQjdvdzFNQXh2TTgwZFVPY3plTThCSStKS3pMdEVxdG1qd0lWQUxqaQpiNkJLcG9zWWpYc2VlUVdtUUg1dHJHWnBBb0dBVzhjd1pTUnBDR1pPUlJzeUdoanNLM2t6RXNOYkNzcTFaRTJkCndHSW1BeVB6bHRSRmh4UWNZRHRiMHZRQ2pvK1QvZmlwb0JmUWsvcTI5Q2huc292QlRJemZrSXF3QlpwMFE3UTcKVVNJMDB4alo4TCtOeXBlYysybkhscytOVFp0TkpBeVdsRWFPSklzaHM1VzZhRFFnSDNjMzFHWWNnaTJwdVRPKwovVWppVTZNQ2dZQWxVUVZzOGRUT1RZdzdia0Z1OVRVOC9zTGxEME1LdUlZdnk4L1pmb29DSWplZE5HaUo5eVhmCkh5VHFibkVmYjF1OHRqL21OcjBWUGV1MHdLdGJOcXVFd3NxcXJYQjgrenIyWk1hOVpoOGR4YlMrQ2o5VUhLU0oKWXNtSmRKNDVKSFFjK09UNzA3bU9McFl3UlhjNjJTSUo0MXBjRVNzdjZyRXNhdzBhNGphM3hBSVVkbGRoZ2ROZApsSGJNM1orSkJ4dU9jWUNxVkg4PQotLS0tLUVORCBEU0EgUFJJVkFURSBLRVktLS0tLQo=",
+        "geoRegion": "EAST",
+        "partitioning": {
+            "partitions": {
+                "partition1": {
+                    "imsiPatterns": [
+                        "^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$"
+                    ],
+                    "sitesByPriority": [
+                        "site1"
+                    ]
+                }
+            },   
+            "sites": [
+                {
+                    "name": "site1",
+                    "ingress_ip": "10.131.65.30"
+                }
+            ]
+        }
+    },
+    "haproxy-ingress": {
+        "controller": {
+            "image": {
+                "repository": "eneapublishereneaartifactstorea3d88639a2.azurecr.io/haproxy-ingress",
+                "tag": "0.14.5"
+            },
+            "service": {
+                "loadBalancerIP": "10.131.65.30"
+            },
+            "haproxy": {
+                "image": {
+                    "repository": "eneapublishereneaartifactstorea3d88639a2.azurecr.io/haproxy",
+                    "tag": "2.8.5"
+                }
+            },
+            "logs": {
+                "image": {
+                    "repository": "eneapublishereneaartifactstorea3d88639a2.azurecr.io/kube-syslog-sidecar",
+                    "tag": "latest"
+                }
+            }         
+        }
+    },
+    "ems01": {
+        "image": "",
+        "optopwv_vol_request": "5Gi",
+        "varoptopwv_vol_request": "5Gi",
+        "ordb_vol_request": "5Gi",
+        "toolsreportingrepo_vol_request": "5Gi",
+        "remotenotify_vol_request": "5Gi",
+        "standard_cli_script": "5Gi",
+        "custom_cli_script": "#!/bin/bash\nems_version=$(ls /opt/opwv/oam)\nOAMCLI=\"/opt/opwv/oam/${ems_version}/bin/OamCommandLine -u rest -p restpass -h localhost \"\necho \"Configuring PercentCores\"\n$OAMCLI -scopedSubLevels -s \"SdmceSystem\" -c \"update Complex/ADMElement//ADMTrafficServer/ats_cpu_usage_parameters/PercentCores:30\"\n$OAMCLI -scopedSubLevels -s \"SdmceSystem\" -c \"update Complex/ILDElement//ILDTrafficServer/ats_cpu_usage_parameters/PercentCores:30\"\n$OAMCLI -scopedSubLevels -s \"SdmceSystem\" -c \"update Complex/CSMElement//CSMTrafficServer/ats_cpu_usage_parameters/PercentCores:30\"\necho \"Configuration complete\"",
+        "node_selector": ""
+    },
+    "ems02": {
+        "image": "",
+        "optopwv_vol_request": "5Gi",
+        "varoptopwv_vol_request": "5Gi",
+        "ordb_vol_request": "5Gi",
+        "toolsreportingrepo_vol_request": "5Gi",
+        "remotenotify_vol_request": "5Gi",
+        "node_selector": ""
+    },
+    "regions": {
+        "site": "site1",        
+        "init_container_image": "eneapublishereneaartifactstorea3d88639a2.azurecr.io/rhel7:latest",
+        "regionsToDeploy": [ "region1", "region2" ],
+        "regions": [
+            {
+                "name": "region1",
+                "affinities": {
+                    "requiredAffinity": "topology.kubernetes.io/zone In \"1\""
+                },
+                "csmLoadBalancerIPs": [ "10.131.65.21" ]
+            },
+            {
+                "name": "region2",
+                "affinities": {
+                    "requiredAffinity": "topology.kubernetes.io/zone In \"2\""
+                },
+                "csmLoadBalancerIPs": [ "10.131.65.22" ]
+            }
+        ],
+        "process_pinning_enabled" : "false",
+        "ild": {
+            "image": "",
+            "replicas": "1",
+            "cpu_request": "4",
+            "cpu_limit": "4",
+            "mem_request": "1024Mi",
+            "mem_limit": "4096Mi",
+            "node_selector": ""
+        },
+        "adm": {
+            "image": "",
+            "replicas": "1",
+            "cpu_request": "4",
+            "cpu_limit": "4",
+            "mem_request": "1024Mi",
+            "mem_limit": "8092Mi",
+            "ddm_vol_request": "5Gi",
+            "node_selector": ""            
+        },
+        "csm": {
+            "image": "",
+            "replicas": "1",
+            "cpu_request": "1",
+            "cpu_limit": "2",
+            "mem_request": "1024Mi",
+            "mem_limit": "4046Mi",
+            "ddm_vol_request": "5Gi",
+            "otherRegionCSMs": [
+                {
+                    "ip": "10.131.65.22", 
+                    "hostname": "site1-region2-stratum-csm-0.stratum-nodes.stratum.svc.cluster.local"
+                }
+            ],
+            "node_selector": ""
+        }
+    },
+    "stratum_client": {
+        "poll_interval": "5s",
+        "request_timeout": "1s",
+        "request_retries": "3"
+    },
+    "nrf_client": {
+        "poll_interval": "5s",
+        "request_timeout": "1s",
+        "retry_interval": "30s",
+        "request_retries": "1",
+        "heartbeat_timer_multiplier": "0.95",
+        "on_stratum_stale": "stop",
+        "nrfs": [
+            {
+                "name": "east_nrf",
+                "geo_region": "EAST",
+                "endpoints": ["http://10.103.64.4:7777"],
+                "profiles": ["east_p1_reg_profile.json"]
+            }
+        ],
+        "profiles": [
+            {
+                "name": "east_p1_reg_profile",
+                "json": "{\r\n          \"allowedNfTypes\": [\r\n            \"NEF\",\r\n            \"HSS\",\r\n            \"UDM\",\r\n            \"PCF\",\r\n            \"UDR\"\r\n          ],\r\n          \"fqdn\": \"site1.enea.org\",\r\n          \"ipv4Addresses\": [\r\n            \"10.131.65.11\"\r\n          ],\r\n          \"nfInstanceId\": \"7bb0c0ae-839f-46b6-a546-d501692d7a70\",\r\n          \"nfServices\": [\r\n            {\r\n            \"allowedNfTypes\": [\r\n                \"NEF\",\r\n                \"HSS\",\r\n                \"UDM\",\r\n                \"PCF\",\r\n                \"UDR\"\r\n            ],\r\n            \"fqdn\": \"site1.enea.org\",\r\n            \"ipEndPoints\": [\r\n                {\r\n                    \"ipv4Address\": \"10.131.65.11\",\r\n                    \"port\": 8003\r\n                }\r\n            ],\r\n            \"nfServiceStatus\": \"REGISTERED\",\r\n            \"scheme\": \"http\",\r\n            \"serviceInstanceId\": \"7bb0c0ae-839f-46b6-a546-d501692d7a70\",\r\n            \"serviceName\": \"nudr-dr\",\r\n            \"versions\": [\r\n                {\r\n                    \"apiFullVersion\": \"2.0.0.alpha-1\",\r\n                    \"apiVersionInUri\": \"v2\"\r\n                }\r\n            ]\r\n            }\r\n          ],\r\n          \"nfStatus\": \"REGISTERED\",\r\n          \"nfType\": \"UDR\",\r\n          \"priority\": 1,\r\n          \"udxrInfo\": {\r\n            \"supiRanges\": [\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}00$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}02$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}04$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}06$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}08$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}10$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}12$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}14$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}16$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}18$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}20$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}22$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}24$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}26$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}28$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}30$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}32$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}34$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}36$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}38$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}40$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}42$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}44$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}46$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}48$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}50$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}52$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}54$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}56$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}58$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}60$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}62$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}64$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}66$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}68$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}70$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}72$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}74$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}76$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}78$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}80$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}82$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}84$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}86$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}88$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}90$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}92$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}94$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}96$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}98$\"\r\n            }\r\n            ]\r\n          }\r\n        }"
+            }
+        ]
+    }
+}
+                
+                  

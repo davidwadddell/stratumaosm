@@ -1,0 +1,46 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "publisherName": {
+            "value": "EneaPublisher"
+        },
+        "nsdGroup": {
+            "value": "StratumNSDG"
+        },
+        "nsdvName": {
+            "value": "1.0.0"
+        },
+        "globalCgvName": {
+            "value": "StratumGlobalCGV"
+        },
+        "siteCgvName": {
+            "value": "StratumSiteCGV"
+        },
+        "globalCgsName": {
+            "value": "StratumGlobalConfiguration"
+        },
+        "siteCgsName": {
+            "value": "StratumSiteConfiguration"
+        },
+        "nfdgroupName": {
+            "value": "StratumNFDG"
+        },
+        "nfdversion": {
+            "value": "1.0.0"
+        },
+        "siteName": {
+            "value": "StratumSite"
+        },
+        "snsName": {
+            "value": "StratumSNS"
+        },
+        "aksClusterName": {
+            "value": "enea-naks-cluster-cl"
+        },
+        "aksClusterGroup": {
+            "value": "rg-precert-ENEA-001"
+        }
+    }
+}
+
