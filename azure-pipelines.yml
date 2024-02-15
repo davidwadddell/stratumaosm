@@ -7,11 +7,11 @@ trigger:
 - main
 
 pool:
-  name: wa25
+  name: MSFT Lab
 
 steps:
 - script: |
      hostname
      pushd /home/dw0647/stratumaosm/stratum/aosm
-     ./deploy_operator.sh
+     #./deploy_operator.sh
   displayName: 'deploy'
