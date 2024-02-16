@@ -9,9 +9,33 @@ trigger:
 pool:
   name: MSFT Lab
 
-steps:
-- script: |
-     hostname
-     pushd /home/dw0647/stratumaosm/stratum/aosm
-     #./deploy_operator.sh
-  displayName: 'deploy'
+stages:
+- stage: 'DefinePublisher'
+  displayName: "Define Publisher Resources"
+  jobs:
+  - job: "DefinePublisherResourcesJob"
+    displayName: "Define Publisher Resource Job"
+    steps:
+      - script: |
+           echo creating publisher resources
+           cd /home/azureuser/stratumaosm/stratum/aosm
+           ./publisher_step1.sh
+- stage: 'DefineAppVersion'
+  jobs:
+  - job: "DefineAppVersionJob"
+    displayName: "Create App Version Job"
+    steps:
+      - script: |
+           echo defining app version
+           cd /home/azureuser/stratumaosm/stratum/aosm
+           ./uploadArtefacts.sh
+           ./publisher_step2.sh
+- stage: 'DeployApp'
+  jobs:
+  - job: "DeployAppJob"
+    displayName: "DeployAppJob"
+    steps:
+      - script: |
+           cd /home/azureuser/stratumaosm/stratum/aosm
+           ./deploy_operator.sh
+
