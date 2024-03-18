@@ -1,0 +1,38 @@
+# Probe configuration
+# Kubernetes defaults to 1 second which may not be long enough
+readinessProbeTimeout: 4
+livenessProbeTimeout: 2
+startupProbeTimeout: 2
+
+# How often the probes run (seconds)
+livenessProbePeriod: 10
+startupProbePeriod: 10
+
+# Number of failures before abort
+livenessFailureThreshold: 30
+startupFailureThreshold: 60
+pod_name: ems02
+replicas: 1
+image:
+cpu_request: 1
+cpu_limit: 2
+mem_request: 1024Mi
+mem_limit: 8092Mi
+
+optopwv_pvc:
+  name: ems02vol-optopwv-claim
+  cloneFrom:
+optopwv_vol_request: 10Gi
+
+ordb_pvc:
+  name: ems02vol-ordb-claim
+  cloneFrom:
+ordb_vol_request: 10Gi
+
+
+varoptopwv_vol_request: 10Gi
+nodeSelector: 
+
+# Volumes for OST artifacts/monitoring
+toolsreportingrepo_vol_request: 5Gi
+remotenotify_vol_request: 5Gi

@@ -1,0 +1,76 @@
+{{- if  .Values.global.multiWorkerNode   }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Values.global.daemonset.pod_name }}
+spec:
+  selector:
+    matchLabels:
+      name: {{ .Values.global.daemonset.pod_name }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.global.daemonset.pod_name }}
+    spec:
+      volumes:
+      - name: {{ .Values.global.daemonset.pod_name }}-vol-configmap
+        configMap:
+          name: {{ .Values.global.daemonset.pod_name }}-configmap
+          defaultMode: 0777
+      hostNetwork: true
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: {{ .Values.global.daemonset.pod_name }}
+        image: {{ .Values.global.daemonset.image }}
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        readinessProbe:
+          exec:
+            command: [ "/bin/sh",  "-c", "pgrep -f stratum_daemonset.sh" ]
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: {{ .Values.global.daemonset.readinessProbeTimeout }}
+        livenessProbe:
+          exec:
+            command: [ "/bin/sh",  "-c", "pgrep -f stratum_daemonset.sh" ]
+          timeoutSeconds: {{ .Values.global.daemonset.livenessProbeTimeout }}
+          failureThreshold: {{ .Values.global.daemonset.livenessFailureThreshold }}
+          periodSeconds: {{ .Values.global.daemonset.livenessProbePeriod }}
+        startupProbe:
+          exec:
+            command: [ "/bin/sh",  "-c", "pgrep -f stratum_daemonset.sh" ]
+          timeoutSeconds: {{ .Values.global.daemonset.startupProbeTimeout }}
+          failureThreshold: {{ .Values.global.daemonset.startupFailureThreshold }}
+          periodSeconds: {{ .Values.global.daemonset.startupProbePeriod }}
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - NET_ADMIN
+        command:
+          - /bin/sh
+          - -c
+          - /opt/opwv/scripts/dameonset/stratum_daemonset.sh
+        resources:
+          limits:
+            cpu: '{{ .Values.global.daemonset.cpu_limit }}'
+            memory: {{ .Values.global.daemonset.mem_limit }}
+          requests:
+            cpu: '{{ .Values.global.daemonset.cpu_request }}'
+            memory: {{ .Values.global.daemonset.mem_request }}
+        volumeMounts:
+           - name: {{ .Values.global.daemonset.pod_name }}-vol-configmap
+             mountPath: "/opt/opwv/scripts/dameonset"
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stratum-daemonset-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  stratum_daemonset.sh: {{- toYaml .Values.global.daemonset.script | nindent 12 }}
+{{- end }}

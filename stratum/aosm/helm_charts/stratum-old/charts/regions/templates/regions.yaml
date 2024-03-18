@@ -1,0 +1,12 @@
+{{  range $region, $data :=  .Values.regions                       }}
+{{    $dict := dict "region" $region  "regionData" $data           }}
+{{    if has $data.name $.Values.regionsToDeploy                   }}
+{{      $dict := merge $dict $                                     }}
+{{      $dict := dict "region" $region  "regionData" $data         }}
+{{      $dict := merge $dict $                                     }}
+{{      template "stratum.adm.ss" $dict                            }}
+{{      template "stratum.csm.service" $dict                       }}
+{{      template "stratum.csm.ss" $dict                            }}
+{{      template "stratum.ild.ss" $dict                            }}
+{{    end                                                          }} 
+{{  end                                                            }}

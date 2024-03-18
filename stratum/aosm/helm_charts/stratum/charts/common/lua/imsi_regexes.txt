@@ -1,0 +1,3 @@
+# Regex : Expected Lua Pattern
+imsi-\d{10}[0-4]0\d{3} : imsi-%d%d%d%d%d%d%d%d%d%d0%d%d%d
+imsi-310956710[0-9]{6} : imsi-310956710[0-9][0-9][0-9][0-9][0-9][0-9]

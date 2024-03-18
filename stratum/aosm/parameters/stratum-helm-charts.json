@@ -3,79 +3,79 @@
     {
       "name": "stratum-common-chart",
       "chartName": "stratum",
-      "version": "4.3.0",
-      "versionRange": "~4.3.0",
+      "version": "4.3.1-GA",
+      "versionRange": "~4.3.1-GA",
       "registryValuesPaths": [ "global.registryPath" ],
       "imagePullSecretsValuesPaths": [ "global.imagePullSecrets" ],
       "releaseName": "stratum-common",
       "releaseNamespace": "stratum",
-      "chartFile": "./helm_charts/stratum-4.3.0.tgz"
+      "chartFile": "./helm_charts/stratum-4.3.1-GA.tgz"
     },
     {
       "name": "stratum-haproxy-chart",
       "chartName": "stratum",
-      "version": "4.3.0",
-      "versionRange": "~4.3.0",
+      "version": "4.3.1-GA",
+      "versionRange": "~4.3.1-GA",
       "registryValuesPaths": [ "global.registryPath" ],
       "imagePullSecretsValuesPaths": [ "haproxy-ingress.controller.imagePullSecrets" ],
       "releaseName": "stratum-haproxy",
       "releaseNamespace": "stratum",
-      "chartFile": "./helm_charts/stratum-4.3.0.tgz"
+      "chartFile": "./helm_charts/stratum-4.3.1-GA.tgz"
     },   
     {
       "name": "stratum-ems01-chart",
       "chartName": "stratum",
-      "version": "4.3.0",
-      "versionRange": "~4.3.0",
+      "version": "4.3.1-GA",
+      "versionRange": "~4.3.1-GA",
       "registryValuesPaths": [ "global.registryPath" ],
       "imagePullSecretsValuesPaths": [ "global.imagePullSecrets" ],
       "releaseName": "stratum-ems01",
       "releaseNamespace": "stratum",
-      "chartFile": "./helm_charts/stratum-4.3.0.tgz"
+      "chartFile": "./helm_charts/stratum-4.3.1-GA.tgz"
     },
     {
       "name": "stratum-ems02-chart",
       "chartName": "stratum",
-      "version": "4.3.0",
-      "versionRange": "~4.3.0",
+      "version": "4.3.1-GA",
+      "versionRange": "~4.3.1-GA",
       "registryValuesPaths": [ "global.registryPath" ],
       "imagePullSecretsValuesPaths": [ "global.imagePullSecrets" ],
       "releaseName": "stratum-ems02",
       "releaseNamespace": "stratum",
-      "chartFile": "./helm_charts/stratum-4.3.0.tgz"
+      "chartFile": "./helm_charts/stratum-4.3.1-GA.tgz"
     },
     {
       "name": "stratum-regions-chart",
       "chartName": "stratum",
-      "version": "4.3.0",
-      "versionRange": "~4.3.0",
+      "version": "4.3.1-GA",
+      "versionRange": "~4.3.1-GA",
       "registryValuesPaths": [ "global.registryPath" ],
       "imagePullSecretsValuesPaths": [ "global.imagePullSecrets" ],
       "releaseName": "stratum-regions",
       "releaseNamespace": "stratum",
-      "chartFile": "./helm_charts/stratum-4.3.0.tgz"
+      "chartFile": "./helm_charts/stratum-4.3.1-GA.tgz"
     },
     {
         "name": "stratum-nrf-client-chart",
         "chartName": "stratum",
-        "version": "4.3.0",
-        "versionRange": "~4.3.0",
+        "version": "4.3.1-GA",
+        "versionRange": "~4.3.1-GA",
         "registryValuesPaths": [ "global.registryPath" ],
         "imagePullSecretsValuesPaths": [ "global.imagePullSecrets" ],
         "releaseName": "stratum-nrf-client",
         "releaseNamespace": "stratum",
-        "chartFile": "./helm_charts/stratum-4.3.0.tgz"
+        "chartFile": "./helm_charts/stratum-4.3.1-GA.tgz"
     },     
     {
       "name": "stratum-pytest-chart",
       "chartName": "stratum",
-      "version": "4.3.0",
-      "versionRange": "~4.3.0",
+      "version": "4.3.1-GA",
+      "versionRange": "~4.3.1-GA",
       "registryValuesPaths": [ "global.registryPath" ],
       "imagePullSecretsValuesPaths": [ "global.imagePullSecrets" ],
       "releaseName": "stratum-pytest",
       "releaseNamespace": "stratum",
-      "chartFile": "./helm_charts/stratum-4.3.0.tgz"
+      "chartFile": "./helm_charts/stratum-4.3.1-GA.tgz"
     }      
   ]
 }

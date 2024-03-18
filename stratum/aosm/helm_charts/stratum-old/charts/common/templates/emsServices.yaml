@@ -1,0 +1,60 @@
+{{/* Template renders services for EMS01/02.
+
+  EMS services provided are as follows
+  For both ems01 and ems02,
+      - if the ems node is enabled within this namespace, a service that selects the ems pod with mapped ports; creating a DNS entry within the namespace for that pod, so that other pods in the namespace may reach it,
+        and an external IP to allow pods in other namespaces/clusters to access it
+      - if the ems node is not enabled within this namespace, a service with an endpoint that references the externalIP of the EMS running in a differenet namespace/cluster,
+        creating a dns entry allowing pods in this namespace to reach out to that EMS
+
+   Additional LB IPs may be specified for both ems01 and ems02, if they must be reached from multiple externalIPs/ networks. 
+
+*/}}
+
+
+{{ range $whichEMS := list  "ems02" "ems01"  }} 
+{{ get $.Values.global.emsServices $whichEMS }} 
+{{ $ips := get $.Values.global.emsServices.loadBalancerIPs $whichEMS }}
+{{- range $i,$ip := $ips }}
+{{ $enabled := (get $.Values.global $whichEMS).enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $whichEMS }}{{ eq $i 0 | ternary "" (printf "-%d" $i ) }}
+spec:
+{{- if $enabled }}
+  # create a service that exposes ems to outside this namespace/cluster
+  type: LoadBalancer
+  loadBalancerIP: {{ $ip }}
+  publishNotReadyAddresses: true
+{{- else }}
+  clusterIP: None
+{{- end }}  
+  ports:
+{{ toYaml $.Values.global.emsServices.ports | indent 4 }}
+{{- if $enabled }}      
+  # ems is in this namespace, select its pod
+  selector:
+    name: {{ $whichEMS }}
+{{- else }}
+  #  ems is not in this namespace/cluster
+  #  map an endpoint into the ems service that puts the remote IP address of EMS in DNS for pods in this namespace/cluster
+  selector: {}
+---
+kind: "Endpoints"
+apiVersion: "v1"
+metadata:
+  name: {{ $whichEMS }}{{ eq $i 0 | ternary "" (printf "-%d" $i ) }}
+subsets:
+  - addresses:
+      - ip: {{ $ip }}
+    ports:
+{{- range $port := $.Values.global.emsServices.ports }}
+      - port: {{ $port.port }}
+        name: {{ $port.name }}
+{{- end }} {{/* end range over ports  */}}
+{{- end }} {{/* if ems enabled  */}}
+{{- end }} {{/* end range over IPs */}}
+{{- end }} {{/* end range ems01/ems02 */}}
+

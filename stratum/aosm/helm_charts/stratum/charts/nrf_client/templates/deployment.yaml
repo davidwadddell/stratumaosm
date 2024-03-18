@@ -1,0 +1,222 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stratum-nrf-client
+spec:
+  replicas: {{ .Values.replicas }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: stratum-nrf-client
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: stratum-nrf-client
+      annotations:
+        prometheus.io/port: "{{ default 9090 .Values.http_port }}"
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics/"
+    spec:
+      volumes:
+      - name: {{ .Values.pod_name }}-config-volume
+        configMap:
+          name: {{ .Values.pod_name }}-config
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: {{ .Values.pod_name }}
+        image: {{ .Values.image | default (print .Values.global.imagesRegistry "/nrf-client:" .Chart.AppVersion ) }}
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        securityContext:
+          readOnlyRootFilesystem: true
+        livenessProbe:
+          httpGet:
+            path: /admin/api/v1/liveness
+            port: {{ default 9090 .Values.http_port }}
+            httpHeaders:
+            - name: Custom-Header
+              value: stratum-liveness
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        command: 
+          - python3
+          - -m
+          - stratum_nrf_client.main
+          - -c
+          - /etc/stratum-nrf-client/config.yaml
+          {{- if .Values.reload_config }}
+          - --reload-config
+          {{- end }}
+          - --logging-config
+          - /etc/stratum-nrf-client/logging.yaml
+          {{- if .Values.reload_logging_config }}
+          - --reload-logging-config
+          {{- end }}
+          {{- if .Values.on_shutdown }}
+          - --on-shutdown
+          - {{ .Values.on_shutdown }}
+          {{- end }}
+          {{- if .Values.liveness_grace }}
+          - --liveness-grace
+          - "{{ .Values.liveness_grace }}"
+          {{- end }}
+          {{- if .Values.http_port }}
+          - --http-port
+          - "{{ .Values.http_port }}"
+          {{- end }}
+          {{- if .Values.http_host }}
+          - --http-host 
+          - {{ .Values.http_host }}
+          {{- end }}
+        volumeMounts:
+          - name: {{ .Values.pod_name }}-config-volume
+            mountPath: "/etc/stratum-nrf-client/"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - stratum-nrf-client
+              topologyKey: "kubernetes.io/hostname"
+      hostname: {{ .Values.pod_name }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.pod_name }}-config
+  namespace: {{ .Release.Namespace }}  
+data:
+  config.yaml: |
+    stratum_client:
+      site: {{ required "Name of site is required" .Values.global.site }}
+      {{- if .Values.stratum_client.endpoint }}
+      endpoint: {{ .Values.stratum_client.endpoint }}
+      {{- else }}
+      endpoint: http://{{ .Values.global.site }}-haproxy-ingress
+      {{- end }}
+      poll_interval: {{ .Values.stratum_client.poll_interval }}
+      request_retries: {{ .Values.stratum_client.request_retries }}
+      request_timeout: {{ .Values.stratum_client.request_timeout }}
+    nrf_client:
+      poll_interval: {{ .Values.nrf_client.poll_interval }}
+      request_timeout: {{ .Values.nrf_client.request_timeout }}
+      retry_interval: {{ .Values.nrf_client.retry_interval }}
+      request_retries: {{ .Values.nrf_client.request_retries }}
+      heartbeat_timer_multiplier: {{ .Values.nrf_client.heartbeat_timer_multiplier }}
+      on_stratum_stale: {{ .Values.nrf_client.on_stratum_stale }}
+      nrfs:
+        {{- range $key, $value := required "at least one nrf is required" .Values.nrfs }}
+        - name: {{ $value.name }}
+          geo_region: {{ required "nrf geo_region is required" $value.geo_region }}
+          endpoints: 
+            {{- range required "at least one nrf endpoint is required" $value.endpoints }}
+            - {{ . }}
+            {{- end }}
+          profiles: 
+            {{- range required "at least one nrf profile is required" $value.profiles }}
+            - {{ . }}
+            {{- end }}
+          {{- end}}
+
+  logging.yaml: |
+    version: 1
+    disable_existing_loggers: false
+    formatters:
+      stratum:
+        style: '{'
+        format: "{asctime}.{msecs:.0f} UTC {levelname} [{thread:X}/{taskName}](0) {filename}:{lineno} {message}"
+        datefmt: "%Y-%m-%d %H:%M:%S"
+      stratum_in:
+        style: '{'
+        format: "{asctime}.{msecs:.0f} UTC IN/{levelname} [{thread:X}/{taskName}](0) {filename}:{lineno} {message}"
+        datefmt: "%Y-%m-%d %H:%M:%S"
+      stratum_out:
+        style: '{'
+        format: "{asctime}.{msecs:.0f} UTC OUT/{levelname} [{thread:X}/{taskName}](0) {filename}:{lineno} {message}"
+        datefmt: "%Y-%m-%d %H:%M:%S"
+      stratum_full_path:
+        style: '{'
+        format: "{asctime}.{msecs:.0f} UTC {levelname} [{thread:X}/{taskName}](0) {pathname}:{lineno} {message}"
+        datefmt: "%Y-%m-%d %H:%M:%S"
+    handlers:
+      stdout:
+        class: logging.StreamHandler
+        formatter: stratum
+        stream: ext://sys.stdout
+      stdout_in:
+        class: logging.StreamHandler
+        formatter: stratum_in
+        stream: ext://sys.stdout
+      stdout_out:
+        class: logging.StreamHandler
+        formatter: stratum_out
+        stream: ext://sys.stdout
+      stdout_other:
+        class: logging.StreamHandler
+        formatter: stratum_full_path
+        stream: ext://sys.stdout
+    loggers:
+      stratum:
+        level: {{ .Values.logging.stratum }}
+        handlers: [stdout]
+        propagate: no
+      stratum.nrf_client.in:
+        level: {{ .Values.logging.nrf_client.in }}
+        handlers: [stdout_in]
+        propagate: no
+      stratum.nrf_client.out:
+        level: {{ .Values.logging.nrf_client.out }}
+        handlers: [stdout_out]
+        propagate: no
+      root:
+        level: {{ .Values.logging.root }}
+        handlers: [stdout_other]
+
+  {{- range $key, $value := .Values.profiles }}
+  {{ $value.name }}.json: {{- toYaml (required "no json in NRF profile" $value.json) | indent 4 }}
+  {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stratum-nrf-client-service
+  labels:
+    app: stratum-nrf-client
+spec:
+  selector:
+    app: stratum-nrf-client
+  ports:
+    - name: metrics
+      protocol: TCP
+      port: {{ default 9090 .Values.http_port }}
+      targetPort: {{ default 9090 .Values.http_port }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: stratum-nrf-client-monitor
+  labels:
+    app: stratum-nrf-client
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: stratum-nrf-client
+  endpoints:
+    - port: "metrics"
+      path: "/metrics/"
+      interval: 30s

@@ -26,7 +26,7 @@
                 }
             }
         },
-        "Version": "4.3.0"
+        "Version": "4.3.1-GA"
     },
     {
         "Values": {
@@ -57,7 +57,7 @@
                 }
             }
         },
-        "Version": "4.3.0"
+        "Version": "4.3.1-GA"
     },  
     {
         "Values": {     
@@ -73,6 +73,10 @@
             },
             "ems01": {
                 "image": "{configurationparameters('StratumSiteConfiguration').ems01.image}",               
+	        "cpu_request": "{configurationparameters('StratumSiteConfiguration').ems01.cpu_request}",
+                "cpu_limit": "{configurationparameters('StratumSiteConfiguration').ems01.cpu_limit}",
+                "mem_request": "{configurationparameters('StratumSiteConfiguration').ems01.mem_request}",
+                "mem_limit": "{configurationparameters('StratumSiteConfiguration').ems01.mem_limit}",
                 "optopwv_vol_request": "{configurationparameters('StratumSiteConfiguration').ems01.optopwv_vol_request}",
                 "varoptopwv_vol_request": "{configurationparameters('StratumSiteConfiguration').ems01.varoptopwv_vol_request}",
                 "ordb_vol_request": "{configurationparameters('StratumSiteConfiguration').ems01.ordb_vol_request}",
@@ -83,7 +87,7 @@
                 "node_selector": "{configurationparameters('StratumSiteConfiguration').ems01.node_selector}"
             }
         },        
-        "Version": "4.3.0"        
+        "Version": "4.3.1-GA"        
     },
     {
         "Values": {
@@ -99,6 +103,10 @@
             },
             "ems02": {
                 "image": "{configurationparameters('StratumSiteConfiguration').ems02.image}",
+                "cpu_request": "{configurationparameters('StratumSiteConfiguration').ems02.cpu_request}",
+                "cpu_limit": "{configurationparameters('StratumSiteConfiguration').ems02.cpu_limit}",
+                "mem_request": "{configurationparameters('StratumSiteConfiguration').ems02.mem_request}",
+                "mem_limit": "{configurationparameters('StratumSiteConfiguration').ems02.mem_limit}",
                 "optopwv_vol_request": "{configurationparameters('StratumSiteConfiguration').ems02.optopwv_vol_request}",
                 "varoptopwv_vol_request": "{configurationparameters('StratumSiteConfiguration').ems02.varoptopwv_vol_request}",
                 "ordb_vol_request": "{configurationparameters('StratumSiteConfiguration').ems02.ordb_vol_request}",
@@ -107,7 +115,7 @@
                 "node_selector": "{configurationparameters('StratumSiteConfiguration').ems02.node_selector}"
             }
         },        
-        "Version": "4.3.0"  
+        "Version": "4.3.1-GA"  
     },
     {
         "Values": {
@@ -174,7 +182,7 @@
                 }
             }
         },        
-        "Version": "4.3.0"         
+        "Version": "4.3.1-GA"         
     },
     {
         "Values": {
@@ -200,7 +208,7 @@
                 "profiles": "{configurationparameters('StratumSiteConfiguration').nrf_client.profiles}"
             }
         },
-        "Version": "4.3.0"
+        "Version": "4.3.1-GA"
     },
     {
         "Values": {
@@ -214,7 +222,7 @@
                 "imagePullPolicy": "{configurationparameters('StratumGlobalConfiguration').global.imagePullPolicy}"
             }
         },        
-        "Version": "4.3.0"
+        "Version": "4.3.1-GA"
     }
 ]
 

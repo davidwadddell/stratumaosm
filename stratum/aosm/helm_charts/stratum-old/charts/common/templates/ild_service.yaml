@@ -1,0 +1,24 @@
+{{- range $i,$ip := .Values.global.ildService.loadBalancerIPs }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Values.global.site}}-{{ $.Values.global.ildService.name }}-{{ $i }}
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{ $ip }}
+  ports:
+    - name: ldap
+      port: {{ $.Values.global.ildService.ldap.port }}
+      protocol: TCP
+      targetPort: {{ $.Values.global.ildService.ldap.targetPort }}
+    - name: sbi
+      port: {{ $.Values.global.ildService.sbi.port }}
+      protocol: TCP
+      targetPort: {{ $.Values.global.ildService.sbi.targetPort }}
+{{ toYaml $.Values.global.ildService.extraPorts | indent 4 }}
+  selector:
+    name: {{ $.Values.global.ild.pod_name }}
+
+---
+{{- end }}

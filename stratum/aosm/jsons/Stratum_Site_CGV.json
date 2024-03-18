@@ -1,7 +1,7 @@
 {
     "global": {
         "site": "site1",
-        "imagesRegistry": "eneapublishereneaartifactstoreefdd192993.azurecr.io",        
+        "imagesRegistry": "eneapublishereneaartifactstore138c564a8f.azurecr.io",        
         "imagePullSecrets": [ ],
         "ssh_Secrets": "",
         "id_rsa_pub_key": "c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFCQVFDNXM0ZFhzQTFVS01DWlVBUGRUcjg5Q0pJbzBVWkQ3eUFObTFqU2JTZGxqYm1oWE1tNmpNZzZRZXg2U0ZtcmIwNmg1Uk5jREs4dkxwQ2VHOXFkd05QbnZFMWZjSC9UUTFraUx6aEhvZVF6TGU1dW1Yb0RlN1JtK1V1b1kxQ2JMOHdVaGJpVnJtZEE0MGl3OTRDcHRzWDRZQXlGNkJHeERUZHl1VGJIdTRobzBPVVVlQSt1SGJTWEo1aGFOemJqZG5YMStxOGpXaUJUSHRaWWJHQVR2OTZnVmRDVkNvdFBZRm04V2NYeE5WNXBnemVOejBINTZqZ2ZzS0pDUXE1RnQwLzhzRXp4Q2lzVEhEempHK3ZpcFU1MEdCUkdMMVgvVkVsY2RQWDNJVzdCakZIeWtXdTEwNHV1NVVxNkV5TnE1Si9qOUt5bDBxZkxvdEZNakYxZnZibk4gcm9vdEBlbXMwMQo=",
@@ -22,7 +22,7 @@
             "sites": [
                 {
                     "name": "site1",
-                    "ingress_ip": "10.131.65.30"
+                    "ingress_ip": "108.153.195.195"
                 }
             ]
         }
@@ -30,21 +30,21 @@
     "haproxy-ingress": {
         "controller": {
             "image": {
-                "repository": "eneapublishereneaartifactstorea3d88639a2.azurecr.io/haproxy-ingress",
+                "repository": "eneapublishereneaartifactstore138c564a8f.azurecr.io/haproxy-ingress",
                 "tag": "0.14.5"
             },
             "service": {
-                "loadBalancerIP": "10.131.65.30"
+                "loadBalancerIP": "108.153.195.195"
             },
             "haproxy": {
                 "image": {
-                    "repository": "eneapublishereneaartifactstorea3d88639a2.azurecr.io/haproxy",
+                    "repository": "eneapublishereneaartifactstore138c564a8f.azurecr.io/haproxy",
                     "tag": "2.8.5"
                 }
             },
             "logs": {
                 "image": {
-                    "repository": "eneapublishereneaartifactstorea3d88639a2.azurecr.io/kube-syslog-sidecar",
+                    "repository": "eneapublishereneaartifactstore138c564a8f.azurecr.io/kube-syslog-sidecar",
                     "tag": "latest"
                 }
             }         
@@ -52,9 +52,13 @@
     },
     "ems01": {
         "image": "",
+	"mem_request": "32Gi",
+        "mem_limit": "32Gi",
+        "cpu_request": "4",
+        "cpu_limit": "4",
         "optopwv_vol_request": "5Gi",
         "varoptopwv_vol_request": "5Gi",
-        "ordb_vol_request": "5Gi",
+        "ordb_vol_request": "50Gi",
         "toolsreportingrepo_vol_request": "5Gi",
         "remotenotify_vol_request": "5Gi",
         "standard_cli_script": "5Gi",
@@ -63,67 +67,66 @@
     },
     "ems02": {
         "image": "",
+	"mem_request": "32Gi",
+        "mem_limit": "32Gi",
+        "cpu_request": "4",
+        "cpu_limit": "4",
         "optopwv_vol_request": "5Gi",
         "varoptopwv_vol_request": "5Gi",
-        "ordb_vol_request": "5Gi",
+        "ordb_vol_request": "50Gi",
         "toolsreportingrepo_vol_request": "5Gi",
         "remotenotify_vol_request": "5Gi",
         "node_selector": ""
     },
     "regions": {
         "site": "site1",        
-        "init_container_image": "eneapublishereneaartifactstorea3d88639a2.azurecr.io/rhel7:latest",
+        "init_container_image": "eneapublishereneaartifactstore138c564a8f.azurecr.io/rhel7:latest",
         "regionsToDeploy": [ "region1", "region2" ],
         "regions": [
             {
                 "name": "region1",
                 "affinities": {
-                    "requiredAffinity": "topology.kubernetes.io/zone In \"1\""
+		    "requiredAffinity": "topology.kubernetes.io/zone In \"1\",\"6\",\"3\",\"4\""
                 },
-                "csmLoadBalancerIPs": [ "10.131.65.21" ]
+                "csmLoadBalancerIPs": [ "108.153.195.193" ]
             },
             {
                 "name": "region2",
                 "affinities": {
-                    "requiredAffinity": "topology.kubernetes.io/zone In \"2\""
+	            "requiredAffinity": "topology.kubernetes.io/zone In \"5\",\"2\",\"7\",\"8\""
                 },
-                "csmLoadBalancerIPs": [ "10.131.65.22" ]
+                "csmLoadBalancerIPs": [ "108.153.195.194" ]
             }
         ],
-        "process_pinning_enabled" : "false",
+        "process_pinning_enabled" : "true",
         "ild": {
             "image": "",
-            "replicas": "1",
-            "cpu_request": "4",
-            "cpu_limit": "4",
-            "mem_request": "1024Mi",
-            "mem_limit": "4096Mi",
+            "replicas": "57",
+            "cpu_request": "6",
+            "cpu_limit": "6",
+            "mem_request": "8Gi",
+            "mem_limit": "8Gi",
             "node_selector": ""
         },
         "adm": {
             "image": "",
-            "replicas": "1",
-            "cpu_request": "4",
-            "cpu_limit": "4",
-            "mem_request": "1024Mi",
-            "mem_limit": "8092Mi",
-            "ddm_vol_request": "5Gi",
+            "replicas": "46",
+            "cpu_request": "6",
+            "cpu_limit": "6",
+            "mem_request": "80Gi",
+            "mem_limit": "80Gi",
+            "ddm_vol_request": "200Gi",
             "node_selector": ""            
         },
         "csm": {
             "image": "",
-            "replicas": "1",
-            "cpu_request": "1",
-            "cpu_limit": "2",
-            "mem_request": "1024Mi",
-            "mem_limit": "4046Mi",
+            "replicas": "40",
+            "cpu_request": "6",
+            "cpu_limit": "6",
+            "mem_request": "8Gi",
+            "mem_limit": "8Gi",
             "ddm_vol_request": "5Gi",
-            "otherRegionCSMs": [
-                {
-                    "ip": "10.131.65.22", 
-                    "hostname": "site1-region2-stratum-csm-0.stratum-nodes.stratum.svc.cluster.local"
-                }
-            ],
+            "otherRegionCSMs": [],
             "node_selector": ""
         }
     },
@@ -150,7 +153,7 @@
         "profiles": [
             {
                 "name": "east_p1_reg_profile",
-                "json": "{\r\n          \"allowedNfTypes\": [\r\n            \"NEF\",\r\n            \"HSS\",\r\n            \"UDM\",\r\n            \"PCF\",\r\n            \"UDR\"\r\n          ],\r\n          \"fqdn\": \"site1.enea.org\",\r\n          \"ipv4Addresses\": [\r\n            \"10.131.65.11\"\r\n          ],\r\n          \"nfInstanceId\": \"7bb0c0ae-839f-46b6-a546-d501692d7a70\",\r\n          \"nfServices\": [\r\n            {\r\n            \"allowedNfTypes\": [\r\n                \"NEF\",\r\n                \"HSS\",\r\n                \"UDM\",\r\n                \"PCF\",\r\n                \"UDR\"\r\n            ],\r\n            \"fqdn\": \"site1.enea.org\",\r\n            \"ipEndPoints\": [\r\n                {\r\n                    \"ipv4Address\": \"10.131.65.11\",\r\n                    \"port\": 8003\r\n                }\r\n            ],\r\n            \"nfServiceStatus\": \"REGISTERED\",\r\n            \"scheme\": \"http\",\r\n            \"serviceInstanceId\": \"7bb0c0ae-839f-46b6-a546-d501692d7a70\",\r\n            \"serviceName\": \"nudr-dr\",\r\n            \"versions\": [\r\n                {\r\n                    \"apiFullVersion\": \"2.0.0.alpha-1\",\r\n                    \"apiVersionInUri\": \"v2\"\r\n                }\r\n            ]\r\n            }\r\n          ],\r\n          \"nfStatus\": \"REGISTERED\",\r\n          \"nfType\": \"UDR\",\r\n          \"priority\": 1,\r\n          \"udxrInfo\": {\r\n            \"supiRanges\": [\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}00$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}02$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}04$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}06$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}08$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}10$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}12$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}14$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}16$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}18$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}20$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}22$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}24$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}26$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}28$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}30$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}32$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}34$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}36$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}38$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}40$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}42$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}44$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}46$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}48$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}50$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}52$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}54$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}56$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}58$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}60$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}62$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}64$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}66$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}68$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}70$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}72$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}74$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}76$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}78$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}80$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}82$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}84$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}86$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}88$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}90$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}92$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}94$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}96$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}98$\"\r\n            }\r\n            ]\r\n          }\r\n        }"
+                "json": "{\r\n          \"allowedNfTypes\": [\r\n            \"NEF\",\r\n            \"HSS\",\r\n            \"UDM\",\r\n            \"PCF\",\r\n            \"UDR\"\r\n          ],\r\n          \"fqdn\": \"site1.enea.org\",\r\n          \"ipv4Addresses\": [\r\n            \"108.153.195.192\"\r\n          ],\r\n          \"nfInstanceId\": \"7bb0c0ae-839f-46b6-a546-d501692d7a70\",\r\n          \"nfServices\": [\r\n            {\r\n            \"allowedNfTypes\": [\r\n                \"NEF\",\r\n                \"HSS\",\r\n                \"UDM\",\r\n                \"PCF\",\r\n                \"UDR\"\r\n            ],\r\n            \"fqdn\": \"site1.enea.org\",\r\n            \"ipEndPoints\": [\r\n                {\r\n                    \"ipv4Address\": \"108.153.195.192\",\r\n                    \"port\": 8003\r\n                }\r\n            ],\r\n            \"nfServiceStatus\": \"REGISTERED\",\r\n            \"scheme\": \"http\",\r\n            \"serviceInstanceId\": \"7bb0c0ae-839f-46b6-a546-d501692d7a70\",\r\n            \"serviceName\": \"nudr-dr\",\r\n            \"versions\": [\r\n                {\r\n                    \"apiFullVersion\": \"2.0.0.alpha-1\",\r\n                    \"apiVersionInUri\": \"v2\"\r\n                }\r\n            ]\r\n            }\r\n          ],\r\n          \"nfStatus\": \"REGISTERED\",\r\n          \"nfType\": \"UDR\",\r\n          \"priority\": 1,\r\n          \"udxrInfo\": {\r\n            \"supiRanges\": [\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}00$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}02$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}04$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}06$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}08$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}10$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}12$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}14$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}16$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}18$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}20$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}22$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}24$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}26$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}28$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}30$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}32$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}34$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}36$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}38$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}40$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}42$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}44$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}46$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}48$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}50$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}52$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}54$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}56$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}58$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}60$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}62$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}64$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}66$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}68$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}70$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}72$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}74$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}76$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}78$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}80$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}82$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}84$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}86$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}88$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}90$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}92$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}94$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}96$\"\r\n            },\r\n            {\r\n                \"pattern\": \"^imsi-\\\\d{13}98$\"\r\n            }\r\n            ]\r\n          }\r\n        }"
             }
         ]
     }

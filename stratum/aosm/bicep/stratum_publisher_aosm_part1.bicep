@@ -9,23 +9,23 @@ param armTemplateVersion string
 param resourceExists bool = false
 
 // Publisher resource
-resource publisher 'Microsoft.HybridNetwork/publishers@2023-04-01-preview' = {
+resource publisher 'Microsoft.HybridNetwork/publishers@2023-04-01-preview' existing = {
   name: publisherName
-  location: location
-  properties: {
-    scope: 'Private'
-  }
+//  location: location
+  //properties: {
+  //  scope: 'Private'
+ // }
 }
 
 // Artifact store resource
-resource acrArtifactStore 'Microsoft.HybridNetwork/publishers/artifactStores@2023-04-01-preview' = {
+resource acrArtifactStore 'Microsoft.HybridNetwork/publishers/artifactStores@2023-04-01-preview' existing = {
   parent: publisher
   name: artifactStore
-  location:location
-  properties: {
-    storeType: 'AzureContainerRegistry'
-    replicationStrategy: 'SingleReplication'    
-  }
+  //location:location
+  //properties: {
+  //  storeType: 'AzureContainerRegistry'
+  //  replicationStrategy: 'SingleReplication'    
+  //}
 }
 
 // Load Helm charts configuration

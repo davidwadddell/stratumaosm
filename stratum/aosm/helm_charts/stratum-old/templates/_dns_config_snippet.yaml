@@ -1,0 +1,9 @@
+{{- define "dns.config" }}
+{{/* This definition of the adm stateful set is included for each.regionData.namein a site  */}}
+      dnsConfig:
+        searches:
+          - {{ $.Values.global.headlessService.name }}.{{ $.Release.Namespace }}.svc.cluster.local  #   allows dns lookup of other pods in the headless service using just pod name.
+        options:
+          - name: timeout
+            value: "{{ $.Values.global.dnsTimeout }}"
+{{- end }}

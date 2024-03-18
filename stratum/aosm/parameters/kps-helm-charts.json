@@ -1,0 +1,16 @@
+{
+  "charts": [
+    {
+      "name": "kps-chart",
+      "chartName": "kube-prometheus-stack",
+      "version": "56.21.3",
+      "versionRange": "~56.21.3",
+      "registryValuesPaths": [ "global.registryPath" ],
+      "imagePullSecretsValuesPaths": [ "global.imagePullSecrets" ],
+      "releaseName": "kube-prometheus-stack",
+      "releaseNamespace": "kube-prom",
+      "chartFile": "./helm_charts/kube-prometheus-stack-56.21.3.tgz"
+    }
+  ]
+}
+

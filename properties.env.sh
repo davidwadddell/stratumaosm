@@ -60,10 +60,10 @@ export mysql_db_username=root
 export mysql_db_password=ch4ngeme
 export mysql_db_name=ordb
 
-export r1_lba_vip_ip=__ENEA_ILD_SVC_IP__
-export lba_vip_list=__ENEA_ILD_SVC_IP__
+export r1_lba_vip_ip=108.153.195.192
+export lba_vip_list=108.153.195.192
 
-export r11_lba_vip=__ENEA_ILD_SVC_IP__
+export r11_lba_vip=108.153.195.192
 export r12_lba_vip=192.168.120.146
 export r21_lba_vip=192.168.120.151
 export r22_lba_vip=192.168.120.156
