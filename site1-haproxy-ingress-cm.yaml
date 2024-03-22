@@ -1,0 +1,106 @@
+apiVersion: v1
+data:
+  config-defaults: |
+    option http-no-delay
+    timeout connect 200
+    timeout client 300s
+    timeout server 5000
+    option dontlog-normal
+    no option prefer-last-server
+    timeout client-fin 1s
+    timeout server-fin 1s
+    no option http-server-close
+  config-frontend-early: |
+    # Stratum: Begin
+    # Define the ACLs first.
+    # Used to determine if the IMSI is in the URL path or query parameters.
+    acl has_imsi_in_url url_reg -i imsi-\d+
+
+    # Used to determine if the MSISDN is in the URL path or query parameters.
+    acl is_msisdn url_reg -i msisdn-\d+
+
+    # We use this ACL to extract the IMSI from the body. The same ACL is intentionally used twice.
+    # With named ACLs, specifying the same ACL name multiple times will cause a logical OR of the conditions.
+    # 1. /nudr-dr/v2/policy-data/subs-to-notify
+    # 2. /nudr-dr/v2/subscription-data/subs-to-notify
+    # 3. /nudr-dr/v2/application-data
+    acl check_body_for_imsi path_reg -i subs-to-notify
+    acl check_body_for_imsi path_reg -i \/nudr-dr\/v.*\/application-data
+
+    # UDSF transactions should only be reouted to the local partition.
+    acl is_udsf path -i -m beg /nudsf-dr
+
+    # All roaming requests should be routed to the local partition too:
+    acl is_roaming path -i -m reg /roaming-plan-profile
+
+    # Used to detect if we already have the UUID header.
+    acl no_stratum_partition_uuid hdr_cnt(stratum-partition-uuid) eq 0
+
+    # ACL to detect ILD health checks. We will use this to send to the local backend.
+    acl is_georegion_health_check path -i -m beg /oam/v1/operational_status
+    # ILD operational status checks should be routed to local ILDs.
+    acl is_operational_status path -i -m beg /builtin/v1/operationalstatus
+
+    # Get the IMSI from the body of a POST request.
+    # We only buffer the request if we know what type of request it is.
+    http-request wait-for-body time 5s at-least 16k if check_body_for_imsi
+    http-request set-var(req.body) req.body if check_body_for_imsi
+
+    # Store data that we need for the Lua scripts.
+    http-request set-var(req.client_ip) fc_src        # The client IP address.
+    http-request set-var(req.client_port) fc_src_port # The client port.
+    http-request set-var(req.url) url                 # Store the full URL.
+    http-request set-var(req.path) path               # The URL path.
+    http-request set-var(req.method) method           # The HTTP method - to detect DELETE requests.
+    http-request set-var(req.existing_uuid) req.hdr(stratum-partition-uuid)
+
+    # If the stratum-specialattributes:2 header is set then we can trace the transaction in detail.
+    http-request set-var(req.partition_trace_enabled) req.hdr(stratum-specialattributes)
+
+    # Record where we came from if sending from one haproxy to another:
+    http-request set-var(req.proxy_origin) req.hdr(stratum-partition-origin)
+
+    # Assign a unique id to the transaction and add it to the request.
+    http-request set-var(req.uuid) uuid() if no_stratum_partition_uuid
+    # Only add the UUID header if it doesn't exist. It may already have been set by an upstream
+    # HAProxy which we must preserve.
+    http-request add-header stratum-partition-uuid %[var(req.uuid)] if no_stratum_partition_uuid
+
+    # Used to determine if requests should be routed only to the local partition.
+    http-request set-var(req.local_partition_only) int(1) if is_udsf or is_roaming or is_georegion_health_check or is_operational_status
+    http-request set-var(req.is_udsf) int(1) if is_udsf
+    http-request set-var(req.is_health_check) int(1) if is_georegion_health_check
+    http-request set-var(req.is_msisdn) int(1) if is_msisdn
+
+    # Request handler: Get the IMSI from the URL path, and store it in 'req.imsi'
+    http-request lua.get_imsi_from_url if has_imsi_in_url
+
+    # If we can't find the IMSI in the URL path, then we scan the entire request.
+    # Note that we check to see if we have already obtained the IMSI from the URL path first.
+    # If the request is a GET then we check the query parameters.
+    # If the request is a DELETE we check to see if the IMSI is in a base64 encoded part of the path.
+    # If the request if a POST then we check the request body.
+    http-request lua.scan_request_for_imsi if check_body_for_imsi
+
+    # The Lua script will filter all requests.
+    # 1. Requests with an IMSI will be routed to the mapped partition.
+    # 2. If no mapping is found then the request is rejected.
+    # 3. Any request that doesn't contain an IMSI is sent to the local partition.
+    use_backend %[lua.select_partition]
+    # Stratum: End
+  config-global: |
+    lua-prepend-path /etc/opwv/?.lua
+    lua-load /etc/opwv/stratum.lua
+    tune.h2.max-concurrent-streams 1000
+    tune.h2.initial-window-size 1048576
+    tune.bufsize 131072
+    nbthread 1
+  health-check-interval: 1s
+  healthz-port: "10253"
+  load-balance: leastconn
+  max-connections: "100000"
+  maxconn-server: "5000"
+  prometheus-port: "9101"
+  slots-min-free: "0"
+  stats-port: "1936"
+  syslog-endpoint: 127.0.0.1:514

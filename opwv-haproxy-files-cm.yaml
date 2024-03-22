@@ -1,0 +1,1671 @@
+apiVersion: v1
+data:
+  base64.lua: "--[[\n\n base64 -- v1.5.3 public domain Lua base64 encoder/decoder\n
+    no warranty implied; use at your own risk\n\n Needs bit32.extract function. If
+    not present it's implemented using BitOp\n or Lua 5.3 native bit operators. For
+    Lua 5.1 fallbacks to pure Lua\n implementation inspired by Rici Lake's post:\n
+    \  http://ricilake.blogspot.co.uk/2007/10/iterating-bits-in-lua.html\n\n author:
+    Ilya Kolbin (iskolbin@gmail.com)\n url: github.com/iskolbin/lbase64\n\n COMPATIBILITY\n\n
+    Lua 5.1+, LuaJIT\n\n LICENSE\n\n See end of file for license information.\n\n--]]\n\n\nlocal
+    base64 = {}\n\nlocal extract = _G.bit32 and _G.bit32.extract -- Lua 5.2/Lua 5.3
+    in compatibility mode\nif not extract then\n\tif _G.bit then -- LuaJIT\n\t\tlocal
+    shl, shr, band = _G.bit.lshift, _G.bit.rshift, _G.bit.band\n\t\textract = function(
+    v, from, width )\n\t\t\treturn band( shr( v, from ), shl( 1, width ) - 1 )\n\t\tend\n\telseif
+    _G._VERSION == \"Lua 5.1\" then\n\t\textract = function( v, from, width )\n\t\t\tlocal
+    w = 0\n\t\t\tlocal flag = 2^from\n\t\t\tfor i = 0, width-1 do\n\t\t\t\tlocal flag2
+    = flag + flag\n\t\t\t\tif v % flag2 >= flag then\n\t\t\t\t\tw = w + 2^i\n\t\t\t\tend\n\t\t\t\tflag
+    = flag2\n\t\t\tend\n\t\t\treturn w\n\t\tend\n\telse -- Lua 5.3+\n\t\textract =
+    load[[return function( v, from, width )\n\t\t\treturn ( v >> from ) & ((1 << width)
+    - 1)\n\t\tend]]()\n\tend\nend\n\n\nfunction base64.makeencoder( s62, s63, spad
+    )\n\tlocal encoder = {}\n\tfor b64code, char in pairs{[0]='A','B','C','D','E','F','G','H','I','J',\n\t\t'K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y',\n\t\t'Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n',\n\t\t'o','p','q','r','s','t','u','v','w','x','y','z','0','1','2',\n\t\t'3','4','5','6','7','8','9',s62
+    or '+',s63 or'/',spad or'='} do\n\t\tencoder[b64code] = char:byte()\n\tend\n\treturn
+    encoder\nend\n\nfunction base64.makedecoder( s62, s63, spad )\n\tlocal decoder
+    = {}\n\tfor b64code, charcode in pairs( base64.makeencoder( s62, s63, spad ))
+    do\n\t\tdecoder[charcode] = b64code\n\tend\n\treturn decoder\nend\n\nlocal DEFAULT_ENCODER
+    = base64.makeencoder()\nlocal DEFAULT_DECODER = base64.makedecoder()\n\nlocal
+    char, concat = string.char, table.concat\n\nfunction base64.encode( str, encoder,
+    usecaching )\n\tencoder = encoder or DEFAULT_ENCODER\n\tlocal t, k, n = {}, 1,
+    #str\n\tlocal lastn = n % 3\n\tlocal cache = {}\n\tfor i = 1, n-lastn, 3 do\n\t\tlocal
+    a, b, c = str:byte( i, i+2 )\n\t\tlocal v = a*0x10000 + b*0x100 + c\n\t\tlocal
+    s\n\t\tif usecaching then\n\t\t\ts = cache[v]\n\t\t\tif not s then\n\t\t\t\ts
+    = char(encoder[extract(v,18,6)], encoder[extract(v,12,6)], encoder[extract(v,6,6)],
+    encoder[extract(v,0,6)])\n\t\t\t\tcache[v] = s\n\t\t\tend\n\t\telse\n\t\t\ts =
+    char(encoder[extract(v,18,6)], encoder[extract(v,12,6)], encoder[extract(v,6,6)],
+    encoder[extract(v,0,6)])\n\t\tend\n\t\tt[k] = s\n\t\tk = k + 1\n\tend\n\tif lastn
+    == 2 then\n\t\tlocal a, b = str:byte( n-1, n )\n\t\tlocal v = a*0x10000 + b*0x100\n\t\tt[k]
+    = char(encoder[extract(v,18,6)], encoder[extract(v,12,6)], encoder[extract(v,6,6)],
+    encoder[64])\n\telseif lastn == 1 then\n\t\tlocal v = str:byte( n )*0x10000\n\t\tt[k]
+    = char(encoder[extract(v,18,6)], encoder[extract(v,12,6)], encoder[64], encoder[64])\n\tend\n\treturn
+    concat( t )\nend\n\nfunction base64.decode( b64, decoder, usecaching )\n\tdecoder
+    = decoder or DEFAULT_DECODER\n\tlocal pattern = '[^%w%+%/%=]'\n\tif decoder then\n\t\tlocal
+    s62, s63\n\t\tfor charcode, b64code in pairs( decoder ) do\n\t\t\tif b64code ==
+    62 then s62 = charcode\n\t\t\telseif b64code == 63 then s63 = charcode\n\t\t\tend\n\t\tend\n\t\tpattern
+    = ('[^%%w%%%s%%%s%%=]'):format( char(s62), char(s63) )\n\tend\n\tb64 = b64:gsub(
+    pattern, '' )\n\tlocal cache = usecaching and {}\n\tlocal t, k = {}, 1\n\tlocal
+    n = #b64\n\tlocal padding = b64:sub(-2) == '==' and 2 or b64:sub(-1) == '=' and
+    1 or 0\n\tfor i = 1, padding > 0 and n-4 or n, 4 do\n\t\tlocal a, b, c, d = b64:byte(
+    i, i+3 )\n\t\tlocal s\n\t\tif usecaching then\n\t\t\tlocal v0 = a*0x1000000 +
+    b*0x10000 + c*0x100 + d\n\t\t\ts = cache[v0]\n\t\t\tif not s then\n\t\t\t\tlocal
+    v = decoder[a]*0x40000 + decoder[b]*0x1000 + decoder[c]*0x40 + decoder[d]\n\t\t\t\ts
+    = char( extract(v,16,8), extract(v,8,8), extract(v,0,8))\n\t\t\t\tcache[v0] =
+    s\n\t\t\tend\n\t\telse\n\t\t\t\t-- Avoid nil values when the encoded string we're
+    decoding is garbage.\n\t\t\t\tif a and b and c and d then\n\t\t\t\t\tlocal v =
+    decoder[a]*0x40000 + decoder[b]*0x1000 + decoder[c]*0x40 + decoder[d]\n\t\t\t\t\ts
+    = char( extract(v,16,8), extract(v,8,8), extract(v,0,8))\n\t\t\t\tend\n\t\tend\n\t\tt[k]
+    = s\n\t\tk = k + 1\n\tend\n\tif padding == 1 then\n\t\tlocal a, b, c = b64:byte(
+    n-3, n-1 )\n\t\tlocal v = decoder[a]*0x40000 + decoder[b]*0x1000 + decoder[c]*0x40\n\t\tt[k]
+    = char( extract(v,16,8), extract(v,8,8))\n\telseif padding == 2 then\n\t\tlocal
+    a, b = b64:byte( n-3, n-2 )\n\t\tlocal v = decoder[a]*0x40000 + decoder[b]*0x1000\n\t\tt[k]
+    = char( extract(v,16,8))\n\tend\n\treturn concat( t )\nend\n\nreturn base64\n\n--[[\n------------------------------------------------------------------------------\nThis
+    software is available under 2 licenses -- choose whichever you prefer.\n------------------------------------------------------------------------------\nALTERNATIVE
+    A - MIT License\nCopyright (c) 2018 Ilya Kolbin\nPermission is hereby granted,
+    free of charge, to any person obtaining a copy of\nthis software and associated
+    documentation files (the \"Software\"), to deal in\nthe Software without restriction,
+    including without limitation the rights to\nuse, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies\nof the Software, and to permit persons
+    to whom the Software is furnished to do\nso, subject to the following conditions:\nThe
+    above copyright notice and this permission notice shall be included in all\ncopies
+    or substantial portions of the Software.\nTHE SOFTWARE IS PROVIDED \"AS IS\",
+    WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO
+    THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+    OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+    IN THE\nSOFTWARE.\n------------------------------------------------------------------------------\nALTERNATIVE
+    B - Public Domain (www.unlicense.org)\nThis is free and unencumbered software
+    released into the public domain.\nAnyone is free to copy, modify, publish, use,
+    compile, sell, or distribute this\nsoftware, either in source code form or as
+    a compiled binary, for any purpose,\ncommercial or non-commercial, and by any
+    means.\nIn jurisdictions that recognize copyright laws, the author or authors
+    of this\nsoftware dedicate any and all copyright interest in the software to the
+    public\ndomain. We make this dedication for the benefit of the public at large
+    and to\nthe detriment of our heirs and successors. We intend this dedication to
+    be an\novert act of relinquishment in perpetuity of all present and future rights
+    to\nthis software under copyright law.\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT
+    WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+    NO EVENT SHALL THE\nAUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN\nACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+    IN CONNECTION\nWITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n------------------------------------------------------------------------------\n--]]\n"
+  stratum.lua: |
+    --[[
+
+      The Stratum HAProxy plugin.
+
+    ]]
+
+    local base64 = require('base64')
+    local stratum_logging = require('stratum_logging')
+    local stratum_mappings = require('stratum_mappings')
+    local stratum_backends = require('stratum_backends')
+
+    --[[
+      The partition mappings file.
+    ]]
+    local mapping_file = "/etc/opwv/site_mapping.txt"
+
+    local stratum = {}
+
+    -- For testing so we can check the number of imsi matches required.
+    local num_pattern_matches = 0
+
+    --[[
+      The name of the backend service that we use when an IMSI is not matched
+      against any of the available partitions.
+    ]]
+    local not_found_backend = ""
+
+    --[[
+      The key is the site name, and the value is an array of IMSI patterns.
+    ]]
+    local site_mappings = {}
+
+    --[[
+      The mappings object that holds the partition mappings.
+    ]]
+    local mappings
+
+    --[[
+      We store the name of the local backend here, so that we can route requests
+      directly to the local backend/partition.
+    ]]
+    local local_backend_name = ""
+
+    -- The local backend object
+    local local_backend_obj = nil
+
+    local local_site = ""
+
+    ------
+    -- Get the IMSI from the POST body. The IMSI will be stored in the
+    -- 'req.imsi' field in the txn object.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    function stratum.get_imsi_from_post(txn, http_method)
+      local body = txn:get_var("req.body")
+
+      if body ~= nil and body:len() ~= 0 then
+
+        local imsi = string.match(body, "imsi%-(%d+)")
+        if imsi == nil then
+          -- Convert the entire body to lowercase and try the match again.
+          body = body:lower()
+          imsi = string.match(body, "imsi%-(%d+)")
+        end
+
+        if imsi ~= nil then
+          --[[
+            Store the IMSI in req.imsi so that we can use it in the
+            HAProxy frontend rules to select the correct backend.
+          ]]
+          stratum.store_imsi(txn, imsi)
+        else
+            local client_ip = txn:get_var("req.client_ip")
+            local client_port = txn:get_var("req.client_port")
+            local url = txn.get_var(txn, "req.url")
+            if client_ip ~= nil and url ~= nil then
+              local c = core.concat()
+              c:add("The IMSI cannot be found in the body of the [")
+              c:add(http_method)
+              c:add("] request for [")
+              c:add(url)
+              c:add("] from client [")
+              c:add(client_ip)
+              c:add("]:")
+              c:add(client_port)
+
+              stratum_logging.warning_log(txn, c:dump())
+            end
+        end
+
+      else
+
+        if stratum_logging.is_tracing_enabled(txn) then
+          local client_ip = txn:get_var("req.client_ip")
+          local client_port = txn:get_var("req.client_port")
+          local url = txn.get_var(txn, "req.url")
+          if client_ip ~= nil and url ~= nil then
+            local c = core.concat()
+            c:add("The [")
+            c:add(http_method)
+            c:add("] request for [")
+            c:add(url)
+            c:add("] from client [")
+            c:add(client_ip)
+            c:add("]:")
+            c:add(client_port)
+            c:add(" contains no body. The IMSI cannot be determined.")
+
+            stratum_logging.trace(txn, c:dump())
+          end
+        end
+
+      end
+    end
+
+    ------
+    -- This function will try to extract a base64 encoded string at the end of a request path.
+    -- We assume that the encoded string is in the last part of the path, so we look for the
+    -- last '/' character and extract the string to the right of it. For example:path
+    --      /nudr-dr/v2/subscription-data/subs-to-notify/eyJpZCI6IjAwMDA
+    -- where the encoded string here is:
+    --     eyJpZCI6IjAwMDA
+    -- (note the above is truncated for brevity).
+    --
+    -- When the encoded string is extracted, then we attempt a base64 decode on it. When decoded
+    -- we then extract the IMSI and store it in 'req.imsi'.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    function stratum.get_imsi_from_base64_encoded_path(txn)
+      -- Get the path provided by HAProxy.
+      local path = txn.get_var(txn, "req.path")
+      if path == nil then
+        stratum_logging.log_imsi_missing(txn)
+        return
+      end
+
+      -- Find the index of the last '/' character in the URL path.
+      local index = path:find("/[^/]*$")
+      if index == nil then
+        stratum_logging.log_imsi_missing(txn)
+        return
+      end
+
+      -- Extract the string after the last '/'
+      local encoded_path = path:sub(index + 1)
+      if encoded_path:len() == 0 or encoded_path == "" then
+        stratum_logging.log_imsi_missing(txn)
+        return
+      end
+
+      -- The string should be base64 encoded and contain the IMSI, so we must decode it.
+      local decoded_path = base64.decode(encoded_path, nil, nil)
+
+      local imsi = stratum.get_imsi_from_path(txn, decoded_path)
+      if imsi ~= nil then
+        stratum.store_imsi(txn, imsi)
+      else
+        stratum_logging.log_imsi_missing(txn)
+      end
+    end
+
+    ------
+    -- Store the IMSI in the txn object.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    -- @param imsi The client IMSI.
+    --
+    function stratum.store_imsi(txn, imsi)
+      txn:set_var("req.imsi", imsi)
+    end
+
+    ------
+    -- Check the IMSI mappings to select the correct partition for the
+    -- provided IMSI.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    -- @param imsi The client IMSI.
+    --
+    -- @param mapping_patterns The site mapping patterns.
+    --
+    -- @return (num_partitions, backend) where
+    --    num_partitions - Is the number of partitions that were matched and checked.
+    --    backend - The backend to use, or nil if there is no match.
+    --
+    function stratum.select_partition_for_imsi(txn, imsi, mapping_patterns)
+      if imsi:len() == 5 then
+        -- Pad out the IMSI with the leading zero's
+        local c = core.concat()
+        c:add("0000000000")
+        c:add(imsi)
+        imsi = c:dump()
+      end
+
+      local num_partitions, backend = stratum_backends.get_active_backend(
+          txn, local_backend_obj, imsi, mapping_patterns, not_found_backend)
+
+      return num_partitions, backend
+    end
+
+    --[[ testing only
+    function stratum.get_num_pattern_matches()
+      return num_pattern_matches
+    end
+    ]]
+
+    ------
+    -- Get the port number from an address. For IPv4 the address will be in the format:
+    --    127.0.0.1:<port>
+    -- For IPv6:
+    --    [::1]:<port>
+    --
+    -- @param addr The IP and port.
+    --
+    -- @return The port number
+    --
+    function stratum.get_port_from_addr(addr)
+      local index = addr:match('^.*:(%d+)$')
+      return index
+    end
+
+    ------
+    -- Determine the backend that maps to the local partition.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    -- @return message The local backend.
+    --
+    function stratum.route_to_local_partition(txn)
+      local is_health_check = txn:get_var("req.is_health_check")
+      if is_health_check then
+        -- Do not log the health checks as they can spam the logs.
+        return local_backend_name
+      end
+
+      local http_method = txn:get_var("req.method")
+      local url = txn:get_var("req.url")
+      local client_ip = txn:get_var("req.client_ip")
+      local client_port = txn:get_var("req.client_port")
+
+      if stratum_logging.is_tracing_enabled(txn) then
+        local c = core.concat()
+        c:add("Routing [")
+        c:add(http_method)
+        c:add("] request [")
+        c:add(url)
+        c:add("] from client [")
+        c:add(client_ip)
+        c:add("]:")
+        c:add(client_port)
+        c:add(" to the local partition [")
+        c:add(local_backend_name)
+        c:add("].")
+        stratum_logging.trace(txn, c:dump())
+      end
+
+      return local_backend_name
+    end
+
+    function stratum.get_imsi_from_path(txn, path)
+      local lower_path = path:lower()
+
+      local imsi = string.match(lower_path, "imsi%-(%d+)")
+      if imsi then
+        if stratum_logging.is_tracing_enabled(txn) then
+          local c = core.concat()
+          c:add("IMSI ")
+          c:add(imsi)
+          c:add(" found in path ")
+          c:add(path)
+
+          stratum_logging.trace(txn, c:dump())
+        end
+
+        return imsi
+      end
+
+      return nil
+    end
+
+    function stratum.trace_sending_to_local_partition(txn)
+      if stratum_logging.is_tracing_enabled(txn) then
+        local http_method = txn:get_var("req.method")
+        local url = txn:get_var("req.url")
+        local client_ip = txn:get_var("req.client_ip")
+        local client_port = txn:get_var("req.client_port")
+
+        local is_udsf = txn:get_var("req.is_udsf")
+        local is_health_check = txn:get_var("req.is_health_check")
+        local is_msisdn = txn:get_var("req.is_msisdn")
+
+        local c = core.concat()
+
+        if is_udsf ~= nil then
+          c:add("The UDSF [")
+          c:add(http_method)
+          c:add("] request [")
+          c:add(url)
+          c:add("] from client [")
+          c:add(client_ip)
+          c:add("]:")
+          c:add(client_port)
+          c:add(" will be routed to the local partition.")
+          stratum_logging.trace(txn, c:dump())
+        elseif is_health_check ~= nil then
+          -- A health check request.
+          c:add("The health check request [")
+          c:add(url)
+          c:add("] from client [")
+          c:add(client_ip)
+          c:add("]:")
+          c:add(client_port)
+          c:add(" will be routed to the local partition.")
+          stratum_logging.trace(txn, c:dump())
+        elseif is_msisdn ~= nil then
+          -- A MSISDN request.
+          c:add("The MSISDN [")
+          c:add(http_method)
+          c:add("] request [")
+          c:add(url)
+          c:add("] from client [")
+          c:add(client_ip)
+          c:add("]:")
+          c:add(client_port)
+          c:add(" will be routed to the local partition.")
+          stratum_logging.trace(txn, c:dump())
+        else
+          c:add("The [")
+          c:add(http_method)
+          c:add("] request [")
+          c:add(url)
+          c:add("] from client [")
+          c:add(client_ip)
+          c:add("]:")
+          c:add(client_port)
+          c:add(" will be routed to the local partition.")
+          stratum_logging.trace(txn, c:dump())
+        end
+      end
+    end
+
+    function stratum.update_partition_hdr(txn)
+      local hdrs = txn.http:req_get_headers()
+      local origins_hdrs = hdrs["stratum-partition-origin"]
+      local hdr_set = false
+
+      if origins_hdrs then
+        local existing_origin = origins_hdrs[0]
+        if existing_origin then
+          local c = core.concat()
+          c:add(existing_origin)
+          c:add(";") -- Delimited by a semi-colon.
+          c:add(local_site)
+          txn.http:req_set_header("stratum-partition-origin", c:dump())
+          hdr_set = true
+        end
+      end
+
+      if not hdr_set then
+        txn.http:req_set_header("stratum-partition-origin", local_site)
+      end
+
+    end
+
+    --[[
+      Public functions registered with HAProxy
+    ]]
+
+    ------
+    -- Extracts the IMSI from a URL.
+    -- Check for IMSI's contained within the path or query parameters. For example:
+    --    /nudr-dr/v2/subscription-data/imsi-310950111000045/context-data
+    --    /nudr-dr/v2/subscription-data/imsi-310950111000045
+    --    /nudr-dr/v2/subscription-data/subs-to-notify?ue-id=imsi-310950111000045
+    --
+    -- The IMSI will be stored in:
+    --    'req.imsi'
+    --
+    -- @param URL The URL path passed in by HAProxy
+    --
+    function get_imsi_from_url(txn)
+      -- Convert the URL to lowercase first.
+      local url = txn:get_var("req.url")
+      local imsi = string.match(url, "imsi%-(%d+)")
+
+      if nil == imsi then
+        -- Try a case insensitive search now.
+        local lower_url = url:lower()
+        imsi = string.match(lower_url, "imsi%-(%d+)")
+      end
+
+      if imsi then
+        if stratum_logging.is_tracing_enabled(txn) then
+          local c = core.concat()
+          c:add("IMSI [")
+          c:add(imsi)
+          c:add("] found in [")
+          c:add(txn:get_var("req.method"))
+          c:add("] request to URL ")
+          c:add(url)
+          c:add(" from [")
+          c:add(txn:get_var("req.client_ip"))
+          c:add("]:")
+          c:add(txn:get_var("req.client_port"))
+          stratum_logging.trace(txn, c:dump())
+        end
+        stratum.store_imsi(txn, imsi)
+      else
+        if stratum_logging.is_tracing_enabled(txn) then
+          local c = core.concat()
+          c:add("No IMSI detected in the [")
+          c:add(txn:get_var("req.method"))
+          c:add("] request to URL [")
+          c:add(url)
+          c:add("] from [")
+          c:add(txn:get_var("req.client_ip"))
+          c:add("]:")
+          c:add(txn:get_var("req.client_port"))
+          stratum_logging.trace(txn, c:dump())
+        end
+      end
+
+    end
+
+    ------
+    -- Selects a partition based on the IMSI.
+    -- The IMSI is stored as 'req.imsi'
+    --
+    -- @param txn The HAProxy transaction context.
+    --            This MUST contain the req.imsi entry.
+    --
+    function find_partition(txn)
+      local num_mappings = mappings:get_number_of_mappings()
+      if num_mappings == 0 then
+        -- There's no partition mapping at all, so all requests must go to the local backend.
+        return stratum.route_to_local_partition(txn)
+      end
+
+      -- Decide if we need to route to the local partition first.
+      local local_partition_only = txn:get_var("req.local_partition_only")
+      local is_msisdn = txn:get_var("req.is_msisdn")
+      if local_partition_only ~= nil or is_msisdn ~= nil then
+        stratum.trace_sending_to_local_partition(txn)
+        return stratum.route_to_local_partition(txn)
+      end
+
+      local trace_logging_enabled = stratum_logging.is_tracing_enabled(txn)
+
+      -- If there's no IMSI in the request (path or body), then we route to the local partition.
+      local imsi = txn:get_var("req.imsi")
+      if imsi == nil then
+        -- Check the path to determine if the IMSI is base64 encoded in the path.
+        stratum.get_imsi_from_base64_encoded_path(txn)
+
+        imsi = txn:get_var("req.imsi")
+        if imsi == nil then
+          if trace_logging_enabled then
+            local c = core.concat()
+            c:add("The [")
+            c:add(txn:get_var("req.method"))
+            c:add("] request [")
+            c:add(txn:get_var("req.url"))
+            c:add("] from client [")
+            c:add(txn:get_var("req.client_ip"))
+            c:add("]:")
+            c:add(txn:get_var("req.client_port"))
+            c:add(" does not contain an IMSI, and will be sent to the local partition only.")
+
+            stratum_logging.trace(txn, c:dump())
+          end
+
+          -- No IMSI found, so we go to the local partition/backend.
+          return stratum.route_to_local_partition(txn)
+        end
+      end
+
+      if trace_logging_enabled then
+        local c = core.concat()
+        c:add("Using IMSI [")
+        c:add(imsi)
+        c:add("] for [")
+        c:add(txn:get_var("req.method"))
+        c:add("] request [")
+        c:add(txn:get_var("req.url"))
+        c:add("] from client [")
+        c:add(txn:get_var("req.client_ip"))
+        c:add("]:")
+        c:add(txn:get_var("req.client_port"))
+        stratum_logging.trace(txn, c:dump())
+      end
+
+      -- Find a backend/partition for this IMSI.
+      local num_partitions, backend = stratum.select_partition_for_imsi(txn, imsi, site_mappings)
+      if backend ~= nil then
+        if trace_logging_enabled then
+          local c = core.concat()
+          c:add("Selecting partition [")
+          c:add(backend)
+          c:add("] for [")
+          c:add(txn:get_var("req.method"))
+          c:add("] request to URL [")
+          c:add(txn:get_var("req.url"))
+          c:add("] from client [")
+          c:add(txn:get_var("req.client_ip"))
+          c:add("]:")
+          c:add(txn:get_var("req.client_port"))
+          c:add(" with IMSI [")
+          c:add(imsi)
+          c:add("]")
+          stratum_logging.trace(txn, c:dump())
+        end
+
+        return backend
+
+      else
+        --[[
+          If this request maps to partitions, but they are all offline then we should
+          reject the request.
+
+          If the request does not map to any partitions then we send it to the local
+          ILDs and let them decide what to do with it.
+        ]]
+        if num_partitions > 0 then
+          local http_method = txn:get_var("req.method")
+          local url = txn:get_var("req.url")
+          local client_ip = txn:get_var("req.client_ip")
+          local client_port = txn:get_var("req.client_port")
+
+          -- We matched at least one partition and they are not available, return a 503.
+          local c = core.concat()
+          c:add("The [")
+          c:add(http_method)
+          c:add("] request to URL [")
+          c:add(url)
+          c:add("] from client [")
+          c:add(client_ip)
+          c:add("]:")
+          c:add(client_port)
+          c:add(" cannot be routed to its defined partition or backup as they are unavailable.")
+          stratum_logging.alert_log(txn, c:dump())
+
+          -- Set the backend to the 503 backend service.
+          backend = not_found_backend
+
+          -- Record that the partitions are not available. This will be made available to
+          -- the partition not found service that is handled by the partition_not_found function.
+          txn:set_var("req.partitions_not_available", "true")
+        else
+          --[[
+            If there's no mapping for a request then we should send to the local backend.
+            The Stratum ILDs can then determine how the request should be handled.
+          ]]
+          backend = stratum.route_to_local_partition(txn)
+
+          if trace_logging_enabled then
+            local c = core.concat()
+            c:add("The [")
+            c:add(txn:get_var("req.method"))
+            c:add("] request to URL [")
+            c:add(txn:get_var("req.url"))
+            c:add("] from client [")
+            c:add(txn:get_var("req.client_ip"))
+            c:add("]:")
+            c:add(txn:get_var("req.client_port"))
+            c:add(" does not map to any partition and will be sent to the local backend.")
+            stratum_logging.trace(txn, c:dump())
+          end
+        end
+
+      end
+
+      return backend
+    end
+
+    function select_partition(txn)
+      local is_health_check = txn:get_var("req.is_health_check")
+
+      local backend = find_partition(txn)
+      if backend then
+        if not is_health_check then
+          -- Record the backend that we're sending the request to.
+          txn.http:req_add_header("stratum-partition-site", backend)
+        end
+      end
+
+      -- Record where the proxy request originates from.
+      if not is_health_check then
+        stratum.update_partition_hdr(txn)
+      end
+
+      return backend
+    end
+
+    ------
+    -- For GET requests we extract the IMSI from the path/query. If the IMSI still
+    -- isn't found in the GET request, then we check the last part of the path for
+    -- a base64 encoded subscriber id.
+    --
+    -- For DELETE requests the IMSI is base64 encoded in the path. The encoded path
+    -- fragment must be extracted and decoded so that we can determine the IMSI.
+    --
+    -- For POST requests the IMSI is in the request body.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    function scan_request_for_imsi(txn)
+      -- Do we already have the IMSI?
+      local imsi = txn:get_var("req.imsi")
+      if imsi ~= nil  and stratum_logging.is_tracing_enabled(txn) then
+        local c = core.concat()
+        c:add("Skipping scan_request_for_imsi as we already have the IMSI: ")
+        c:add(imsi)
+        stratum_logging.trace(txn, c:dump())
+        return
+      end
+
+      local is_msisdn = txn:get_var("req.is_msisdn")
+      if is_msisdn then
+        -- Go straight to the local partition.
+        return
+      end
+
+      local http_method = txn:get_var("req.method")
+      http_method = http_method:upper()
+
+      if http_method == "DELETE" then
+        -- Try to get the IMSI from the base64 encoded path.
+        stratum.get_imsi_from_base64_encoded_path(txn)
+      elseif http_method == "POST" or http_method == "PUT" then
+        -- Get the IMSI from the POST body.
+        stratum.get_imsi_from_post(txn, http_method)
+      elseif http_method == "GET" or http_method == "PATCH" then
+        -- Get the IMSI from the URL path.
+        get_imsi_from_url(txn)
+      else
+        local url = txn:get_var("req.url")
+        local client_ip = txn:get_var("req.client_ip")
+        local client_port = txn:get_var("req.client_port")
+
+        local c = core.concat()
+        c:add("Unsupported HTTP method [")
+        c:add(http_method)
+        c:add("] in scan_request_for_imsi for URL [")
+        c:add(url)
+        c:add("] from client [")
+        c:add(client_ip)
+        c:add("]:")
+        c:add(client_port)
+        stratum_logging.warning_log(txn, c:dump())
+      end
+    end
+
+    --[[
+      Loads the site and IMSI mappings.
+    ]]
+    function load_imsi_mappings()
+      site_mappings = {}
+
+      local backends = {}
+
+      core.Info("Available backends:")
+      for _, backend in pairs(core.backends) do
+        local backend_type = backend:get_cap()
+        if backend ~= nil then
+          local backend_name = backend:get_name()
+          if backend_type and backend_type == "backend" then
+            core.Info(string.format("  Backend: %s", backend_name))
+            table.insert(backends, backend)
+          end
+
+          -- Find the backend name for the 'no-partition' service.
+          if backend_name:match("no%-partition") then
+            not_found_backend = backend_name
+          end
+        end
+      end
+
+      if not_found_backend ~= "" then
+        core.Info(string.format("Partition not found service backend: %s", not_found_backend))
+      else
+        core.Alert("The backend for the partition not found service could not be found in haproxy.cfg")
+      end
+
+      core.Info("Loading the IMSI partition mappings from file: " .. mapping_file)
+      mappings = stratum_mappings:new(mapping_file, backends)
+      site_mappings = mappings:get_mappings()
+      mappings:log_mappings(mapping_file)
+
+      local number_of_mappings =  mappings:get_number_of_mappings()
+      if number_of_mappings == 0 then
+        core.Info("No Stratum partition mappings have been configured. All requests will be sent to the local partition.")
+      else
+        core.Info("All Stratum partition mappings loaded.")
+      end
+
+      core.Info("ENEA Stratum HAProxy Lua plugin loaded.")
+    end
+
+    ------
+    -- Examines all the configured backends to determine which is the local one.
+    -- We select the backend that has 'ingress-local' in its name.
+    --
+    local function determine_local_partition()
+      for _, backend in pairs(core.backends) do
+        local backend_name = backend:get_name()
+        local backend_type = backend:get_cap()
+
+        if backend_type and backend_type == "backend" then
+          if backend_name:match("ingress%-local") then
+            local_backend_name = backend_name
+            local_backend_obj = backend
+            core.Debug("Detecting the local backend/partition [" .. local_backend_name .. "]")
+            break
+          end
+        end
+      end
+
+      if local_backend_name == ""  or local_backend_name == nil then
+        core.Alert("Failed to detect a local backend")
+      end
+
+      -- Determine the local site.
+      local_site = mappings:find_matching_site(local_backend_name)
+      if local_site then
+        core.Debug("Detecting the local site as [" .. local_site .. "]")
+      else
+        core.Alert("Failed to determine the local site.")
+      end
+
+    end
+
+    local function create_partitions_not_available_message(client_ip, client_port, url, imsi, uuid)
+      local response
+
+      if url and client_ip then
+        if imsi then
+          response = [==[
+              <html><head><title>Stratum</title></head>
+              <body><h1>503 Service Unavailable</h1>
+              <p>The request from client [%s]:%s to URL: <pre>%s</pre>
+              with IMSI [%d] cannot be routed to any partition - the partitions are unavailable.</p>
+              <pre>uuid: %s</pre>
+              </body></html>
+              ]==]
+          response = string.format(response, client_ip, client_port, url, imsi, uuid)
+        else
+          response = [==[
+              <html><head><title>Stratum</title></head>
+              <body><h1>503 Service Unavailable</h1>
+              <p>The request from client [%s]:%s to URL: <pre>%s</pre>
+              cannot be routed to any partition - the partitions are unavailable.</p>
+              <pre>uuid: %s</pre>
+              </body></html>
+              ]==]
+          response = string.format(response, client_ip, client_port, url, uuid)
+        end
+      else
+        response = [==[
+            <html><title>Stratum</title>
+            <head><title>Stratum</title></head>
+            <body><h1>503 Service Unavailable</h1>
+            <p>Invalid request: The request could not be routed to any partition - the partitions are unavailable.</p>
+            <pre>uuid: %s</pre>
+            </body></html>
+            ]==]
+        response = string.format(response, uuid)
+      end
+
+      return response
+    end
+
+    local function create_ilds_not_available_message(client_ip, client_port, url, imsi, be, uuid)
+      local response
+
+      if url and client_ip then
+        if imsi then
+          response = [==[
+              <html><head><title>Stratum</title></head>
+              <body><h1>503 Service Unavailable</h1>
+              <p>The request from client [%s]:%s to URL: <pre>%s</pre>
+              with IMSI [%d] cannot be routed to the local partition [%s] - All ILDs are unavailable.</p>
+              <pre>uuid: %s</pre>
+              </body></html>
+              ]==]
+          response = string.format(response, client_ip, client_port, url, imsi, be, uuid)
+        else
+          response = [==[
+              <html><head><title>Stratum</title></head>
+              <body><h1>503 Service Unavailable</h1>
+              <p>The request from client [%s]:%s to URL: <pre>%s</pre>
+              cannot be routed to the local partition [%s] - All ILDs are unavailable.</p>
+              <pre>uuid: %s</pre>
+              </body></html>
+              ]==]
+          response = string.format(response, client_ip, client_port, url, be, uuid)
+        end
+      else
+        response = [==[
+            <html><title>Stratum</title>
+            <head><title>Stratum</title></head>
+            <body><h1>503 Service Unavailable</h1>
+            <p>Invalid request: The request could not be routed to the partition [%s] - All ILDs are unavailable.</p>
+            <pre>uuid: %s</pre>
+            </body></html>
+            ]==]
+        response = string.format(response, be, uuid)
+      end
+
+      return response
+    end
+
+    ------
+    -- A HAProxy service that sends back an error message and status code
+    -- when a request is made that:
+    --    1. The local partition is not available - all ILDs are down.
+    --
+    -- @param applet The HAProxy applet.
+    --
+    function partition_not_found(applet)
+      local url = applet:get_var("req.url")
+      local client_ip = applet:get_var("req.client_ip")
+      local client_port = applet:get_var("req.client_port")
+      local imsi = applet:get_var("req.imsi")
+
+      local be = applet:get_var("req.unavailable_partition")
+      if be == nil then
+        be = ""
+      end
+
+      local uuid = applet:get_var("req.existing_uuid")
+      if uuid == nil or uuid == "" then
+        uuid = applet:get_var("req.uuid")
+      end
+
+      if uuid == nil then
+        uuid = ""
+      end
+
+      local partitions_not_available = applet:get_var("req.partitions_not_available")
+
+      local response
+      if partitions_not_available ~= nil and partitions_not_available == "true" then
+        response = create_partitions_not_available_message(client_ip, client_port, url, imsi, uuid)
+      else
+        response = create_ilds_not_available_message(client_ip, client_port, url, imsi, be, uuid)
+      end
+
+      applet:set_status(503, "Service Unavailable")
+      applet:add_header("Content-Length", string.len(response))
+      applet:add_header("Content-Type", "text/html")
+      applet:add_header("Cache-Control", "no-cache")
+
+      if uuid ~= nil then
+        applet:add_header("stratum-partition-uuid", uuid)
+      end
+
+      applet:start_response()
+      applet:send(response)
+    end
+
+    --[[
+      Register our functions with HAProxy.
+    ]]
+    core.register_init(load_imsi_mappings)
+    core.register_init(determine_local_partition)
+    core.register_fetches("select_partition", select_partition)
+    core.register_action("get_imsi_from_url", {"http-req"}, get_imsi_from_url, 0)
+    core.register_action("scan_request_for_imsi", {"http-req"}, scan_request_for_imsi, 0)
+    core.register_service("partition_not_found", "http", partition_not_found)
+
+
+    --[[
+      For testing only.
+    ]]
+    function load_test_mappings(site_mapping_file)
+      local backends = {}
+
+      core.Info("Available backends:")
+      for _, backend in pairs(core.backends) do
+        local backend_type = backend:get_cap()
+        if backend ~= nil then
+          local backend_name = backend:get_name()
+          if backend_type and backend_type == "backend" then
+            core.Info(string.format("  Backend: %s", backend_name))
+            table.insert(backends, backend)
+          end
+
+          -- Find the backend name for the 'no-partition' service.
+          if backend_name:match("no%-partition") then
+            not_found_backend = backend_name
+          end
+        end
+      end
+
+      mappings = stratum_mappings:new(site_mapping_file, backends)
+      site_mappings = mappings:get_mappings()
+      determine_local_partition()
+      local number_of_mappings =  mappings:get_number_of_mappings()
+
+      if not_found_backend ~= "" then
+        core.Info(string.format("Partition not found service backend: %s", not_found_backend))
+      else
+        core.Alert("The backend for the partition not found service could not be found in haproxy.cfg")
+      end
+
+      if number_of_mappings == 0 then
+        core.Info("No Stratum partition mappings have been configured. All requests will be sent to the local partition.")
+      else
+        core.Info("All Stratum partition mappings loaded.")
+      end
+
+      core.Info("ENEA Stratum HAProxy Lua plugin loaded.")
+    end
+
+    function get_site_mappings()
+      return site_mappings
+    end
+
+    function set_local_backend(backend)
+      local_backend_name = backend
+    end
+
+    return stratum
+
+    -- END
+  stratum_backends.lua: |
+    local stratum_logging = require('stratum_logging')
+    local string_utils = require('string_utils')
+
+    local stratum_backends = {}
+
+    ------
+    -- Checks if the request should just be routed directly to the local backend.
+    -- This is determined by checking the 'req.proxy_origin' txn variable. This is
+    -- set if the 'stratum-partition-origin' header is set. This indicates that the
+    -- request has been forwarded from another HAProxy. We can only allow at most 1-hop
+    -- from one HAProxy instance to another, and then we must route directly to the
+    -- ILDs.
+    --
+    -- The exception to this is when the local backend is down, in which case we see if
+    -- there are other spares available to handle the request.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    -- @param local_backend_obj The local HAProxy backend object that routes directly to the ILDs.
+    --
+    -- @param proxy_origin_site The site from where haproxy forwarded the request.
+    --
+    -- @return true If the local backend is available and can handle requests.
+    --
+    function stratum_backends.check_if_request_should_be_routed_to_local(txn, local_backend_obj, proxy_origin_site)
+
+      local trace_logging_enabled = stratum_logging.is_tracing_enabled(txn)
+
+      if trace_logging_enabled then
+        local c = core.concat()
+        c:add("The request has been routed from another ingress in site [")
+        c:add(proxy_origin_site)
+        c:add("]")
+        stratum_logging.trace(txn, c:dump())
+      end
+
+      --[[
+        We must route this request to the local backend, but first
+        check if the local backend is available.
+      ]]
+      if stratum_backends.is_backend_available(txn, local_backend_obj) then
+        if trace_logging_enabled then
+          local cn = core.concat()
+          cn:add("The request will now be routed directly to the local backend [")
+          cn:add(local_backend_obj:get_name())
+          cn:add("]")
+          stratum_logging.trace(txn, cn:dump())
+        end
+
+        -- The local backend is available, so we'll use it.
+        return true
+      else
+        local url = txn:get_var("req.url")
+        local client_ip = txn:get_var("req.client_ip")
+        local client_port = txn:get_var("req.client_port")
+        local http_method = txn:get_var("req.method")
+
+        local cn = core.concat()
+        cn:add("The [")
+        cn:add(http_method)
+        cn:add("] request [")
+        cn:add(url)
+        cn:add("] from client [")
+        cn:add(client_ip)
+        cn:add("]:")
+        cn:add(client_port)
+        cn:add(" cannot be routed to the local backend as it has no available servers.")
+
+        stratum_logging.warning_log(txn, cn:dump())
+      end
+
+      return false
+    end
+
+    ------
+    -- Checks the server stats to check if the server has state UP
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    -- @param backend The HAProxy backend.
+    --
+    -- @param server The server that belongs to the backend.
+    --
+    -- @return true If the server has state UP, otherwise false.
+    --
+    function stratum_backends.is_server_up(txn, backend, server)
+      local server_stats = server:get_stats()
+      if server_stats then
+        local status = server_stats["status"]
+        if status and status == "UP" then
+          if stratum_logging.is_tracing_enabled(txn) then
+            local c = core.concat()
+            c:add("The server [")
+            c:add(server:get_name())
+            c:add("] in backend [")
+            c:add(backend:get_name())
+            c:add("] is available: [")
+            c:add(status)
+            c:add("]")
+
+            stratum_logging.trace(txn, c:dump())
+          end
+
+          return true
+        else
+          if stratum_logging.is_tracing_enabled(txn) then
+            -- Use trace logging to avoid log spamming.
+            local c = core.concat()
+            c:add("The server [")
+            c:add(server:get_name())
+            c:add("] in backend [")
+            c:add(backend:get_name())
+            c:add("] is not available: [")
+            c:add(status)
+            c:add("]")
+
+            stratum_logging.trace(txn, c:dump())
+          end
+        end
+      end
+
+      return false
+    end
+
+    ------
+    -- Checks if at least one server in the backend is reported as UP.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    -- @param backend The HAProxy backend object containing the servers and their stats.
+    --
+    -- @return true if the backend has at least one server UP.
+    --
+    function stratum_backends.is_backend_available(txn, backend)
+      local is_available = false
+
+      local servers = backend.servers
+      if servers then
+        for _, server in pairs(servers) do
+          if stratum_backends.is_server_up(txn, backend, server) then
+            -- At least one server is available, so we can route to this backend.
+            return true
+          end
+        end
+      end
+
+      return is_available
+    end
+
+    ------
+    -- Check all the backends to find a matching site.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    -- @param backend The backend mapped to the site.
+    --
+    -- @param local_backend_obj The local HAProxy backend object that routes directly to the ILDs.
+    --
+    -- @param not_found_backend The backend to use when a valid backend cannot be used.
+    --
+    -- @return The backend to use, or nil if there is no match.
+    --
+    function stratum_backends.get_backend(txn, backend, local_backend_obj, not_found_backend)
+      if backend == nil then
+        return nil
+      end
+
+      local backend_name = backend:get_name()
+
+      -- TODO: If we let HAProxy do its own fail over by defining back servers then we wouldn't need to call this.
+      -- TODO: We could just return the backend.
+      if stratum_backends.is_backend_available(txn, backend) then
+        return backend_name
+      else
+        -- No servers listed in this backend
+        local url = txn:get_var("req.url")
+        local client_ip = txn:get_var("req.client_ip")
+        local client_port = txn:get_var("req.client_port")
+        local http_method = txn:get_var("req.method")
+
+        local cn = core.concat()
+        cn:add("The [")
+        cn:add(http_method)
+        cn:add("] request to URL [")
+        cn:add(url)
+        cn:add("] from client [")
+        cn:add(client_ip)
+        cn:add("]:")
+        cn:add(client_port)
+        cn:add(" cannot be routed to backend [")
+        cn:add(backend:get_name())
+        cn:add("] as it has no available servers. Check the haproxy container logs to determine why the backend is not available.")
+        stratum_logging.warning_log(txn, cn:dump())
+
+        -- Is this the local backend? If so we must reject the request.
+        if backend_name == local_backend_obj:get_name() then
+          txn:set_var("req.unavailable_partition", backend_name)
+          return not_found_backend
+        end
+      end
+
+      return nil
+    end
+
+    ------
+    -- Check the imsi against the pattern. The imsi must be a full match, not a
+    -- partial match. For example, the imsi
+    --    12345678
+    -- would partially match again the pattern:
+    --    %d%d%d
+    -- which just matches 3 digits. In this case the match would be 123, but since
+    -- 123 != 12345678 then it's only a partial match.
+    --
+    -- @param imsi The imsi number to match.
+    --
+    -- @param pattern The pattern to match the imsi against.
+    --
+    -- @return True or false
+    --
+    function stratum_backends.matches_imsi_pattern(imsi, pattern)
+      local imsi_number = imsi:match(pattern)
+      if imsi_number then
+        -- We have a match, but we need to determine if it's an exact match.
+        if imsi_number == imsi then
+          -- This is an exact match.
+          return true
+        end
+      end
+
+      return false
+    end
+
+    ------
+    -- Picks a partition for the request by checking the IMSI against the configured
+    -- partition mappings.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    -- @param imsi The IMSI that has been extracted from the request.
+    --
+    -- @param mappings The configured partition mappings to check the IMSI against.
+    --
+    -- @param proxy_origin_site The name of the remote site that has forwarded the request,
+    --                          or nil if the request comes directly from the client.
+    --
+    -- @param local_backend_obj The local HAProxy backend object that routes directly to the ILDs.
+    --
+    -- @param not_found_backend The backend to use when a valid backend cannot be used.
+    --
+    -- @return (num_partitions, backend) where
+    --        num_partitions - Is the number of partitions that were matched and checked.
+    --        backend - The backend to route the request to, or nil if there are no available backends.
+    --
+    function stratum_backends.check_mappings(txn, imsi, mappings, proxy_origin_site, local_backend_obj, not_found_backend)
+      -- Record the number of partitions that mapped to the IMSI and that were checked.
+      local num_partitions_checked = 0
+
+      local trace_logging_enabled = stratum_logging.is_tracing_enabled(txn)
+
+      for pattern, sites_and_priorities in pairs(mappings) do
+
+        if stratum_backends.matches_imsi_pattern(imsi, pattern) then
+          --[[
+            We found a matching pattern. Check all associated sites, which
+            have been ordered by priority.
+          ]]
+          for _, sites in pairs(sites_and_priorities) do
+            local priority = sites[1]
+            local site_name = sites[2]
+            local backend = sites[3]
+
+            if trace_logging_enabled then
+              local c = core.concat()
+              c:add("Checking site [")
+              c:add(site_name)
+              c:add("] with priority [")
+              c:add(priority)
+              c:add("]")
+              stratum_logging.trace(txn, c:dump())
+            end
+
+            if proxy_origin_site ~= nil and proxy_origin_site:match(site_name_pattern) then
+              -- The request came from this site, so don't send it back!
+              -- Check the next site.
+              if trace_logging_enabled then
+                local c = core.concat()
+                c:add("We cannot route the request back to ")
+                c:add(site_name)
+                c:add(" as this is where we received it from")
+                stratum_logging.trace(txn, c:dump())
+              end
+            else
+
+              num_partitions_checked = num_partitions_checked + 1
+
+              -- Is the backend for this site available?
+              local backend = stratum_backends.get_backend(txn, backend, local_backend_obj, not_found_backend)
+              if backend then
+                return num_partitions_checked, backend
+              end
+            end
+
+          end
+        end
+      end
+
+      -- No backend found!
+      return num_partitions_checked, nil
+    end
+
+    ------
+    -- This function will:
+    --
+    --  1. Try to match the imsi against one of the configured patterns.
+    --  2. If a match is found then select the priority backend and
+    --     determine if it is available for requests.
+    --  3. If the request has been forwarded from another HAProxy instance,
+    --     then the local partition must be selected if it is available.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    -- @param local_backend_obj The local HAProxy backend object that routes directly to the ILDs.
+    --
+    -- @param imsi The IMSI that has been extracted from the request.
+    --
+    -- @param mappings The configured partition mappings to check the IMSI against.
+    --
+    -- @param not_found_backend The backend to use when a valid backend cannot be used.
+    --
+    -- @return (num_partitions, backend) where
+    --        num_partitions - Is the number of partitions that were matched and checked.
+    --        backend - The backend to route the request to, or nil if:
+    --                  1. The request does not map to any partition.
+    --                  2. The partition(s) is unavailable (down).
+    --
+    function stratum_backends.get_active_backend(txn, local_backend_obj, imsi, mappings, not_found_backend)
+      --[[
+        Tracks if we received this request from a haproxy in another site.
+        If set:
+          1. then we can never route back to that site.
+          2. We must now route directly to the local partition.
+      ]]
+      local proxy_origin_site = txn:get_var("req.proxy_origin")
+      if proxy_origin_site ~= nil then
+        -- We received this request from a remote HAProxy. This request must now be sent directly to the local partition.
+        return 1, local_backend_obj:get_name()
+      end
+
+      -- Find a backend that has available servers.
+      local num_partitions_checked, backend = stratum_backends.check_mappings(txn, imsi, mappings, proxy_origin_site,
+          local_backend_obj, not_found_backend)
+
+      return num_partitions_checked, backend
+    end
+
+    return stratum_backends
+  stratum_logging.lua: |
+    local stratum_logging = {}
+
+    ------
+    -- Get the UUID from the current request. It's either an existing uuid sent
+    -- from a remote haproxy instance, or a new uuid set by the current haproxy
+    -- instance.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    -- @return The uuid
+    --
+    local function get_uuid(txn)
+      -- Try to use an existing uuid if one has already been defined.
+      local uuid = txn:get_var("req.existing_uuid")
+      if uuid == nil or uuid == "" then
+        uuid = txn:get_var("req.uuid")
+      end
+      return uuid
+    end
+
+    ------
+    -- Generates a debug log prefixed with the UUID
+    --
+    -- @param txn The HAProxy transaction context.
+    -- @param message The debug message.
+    --
+    function stratum_logging.debug_log(txn, message)
+      local uuid = get_uuid(txn)
+
+      local c = core.concat()
+      c:add("[uuid=")
+      c:add(uuid)
+      c:add("] ")
+      c:add(message)
+
+      txn:Debug(c:dump())
+    end
+
+    ------
+    -- Generates an alert log prefixed with the UUID
+    --
+    -- @param txn The HAProxy transaction context.
+    -- @param message The debug message.
+    --
+    function stratum_logging.alert_log(txn, message)
+      local uuid = get_uuid(txn)
+
+      local c = core.concat()
+      c:add("[uuid=")
+      c:add(uuid)
+      c:add("] ")
+      c:add(message)
+
+      txn:Alert(c:dump())
+    end
+
+    ------
+    -- Generates a warning log prefixed with the UUID
+    --
+    -- @param txn The HAProxy transaction context.
+    -- @param message The debug message.
+    --
+    function stratum_logging.warning_log(txn, message)
+      local uuid = get_uuid(txn)
+
+      local c = core.concat()
+      c:add("[uuid=")
+      c:add(uuid)
+      c:add("] ")
+      c:add(message)
+
+      txn:Warning(c:dump())
+    end
+
+    ------
+    -- Logs a warning if the IMSI cannot be found within the request.
+    --
+    -- @param txn The HAProxy transaction context.
+    --
+    function stratum_logging.log_imsi_missing(txn)
+      if stratum_logging.is_tracing_enabled(txn) then
+        local url = txn:get_var("req.url")
+        local client_ip = txn:get_var("req.client_ip")
+        local client_port = txn:get_var("req.client_port")
+        local http_method = txn:get_var("req.method")
+        local uuid = get_uuid(txn)
+
+        if url and client_ip and http_method then
+          local c = core.concat()
+          c:add("[uuid=")
+          c:add(uuid)
+          c:add("] No IMSI found within the [")
+          c:add(http_method)
+          c:add("] request for URL [")
+          c:add(url)
+          c:add("] from client [")
+          c:add(client_ip)
+          c:add("]:")
+          c:add(client_port)
+
+          stratum_logging.trace(txn, c:dump())
+        end
+      end
+    end
+
+    function stratum_logging.trace(txn, message)
+      local trace_enabled = txn:get_var("req.partition_trace_enabled")
+      if trace_enabled then
+        local uuid = get_uuid(txn)
+
+        local c = core.concat()
+        c:add("[uuid=")
+        c:add(uuid)
+        c:add("] [TRACE] ")
+        c:add(message)
+
+        txn:Info(c:dump())
+      end
+    end
+
+    function stratum_logging.is_tracing_enabled(txn)
+      local trace_enabled = txn:get_var("req.partition_trace_enabled")
+      if trace_enabled then
+        return true
+      end
+      return false
+    end
+
+    return stratum_logging
+  stratum_mappings.lua: |2+
+
+    local stratum_mappings = {}
+    local string_utils = require('string_utils')
+
+    ------
+    -- Loads the partition mapping file and stores it as a table; mappings
+    --
+    -- The mappings table is keyed off the IMSI pattern.
+    -- The value for the IMSI pattern is an array of tables. With each entry being.
+    --   priority, site_name, backend object
+    -- This sub-table is ordered by priority so we always select the primary entry first.
+    --
+    -- For example the mappings would like:
+    --    IMSI = ^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]51[0-9][0-9][0-9]$
+    --        Priority = 1 - Name = west-site1 - Backend = west-site1_west-site1-ingress-local
+    --        Priority = 2 - Name = site3 - Backend = west-site1_site3-ingress
+    --    IMSI = ^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]48[0-9][0-9][0-9]$
+    --        Priority = 1 - Name = west-site1 - Backend = west-site1_west-site1-ingress-local
+    --        Priority = 2 - Name = site3 - Backend = west-site1_site3-ingress
+    --
+    -- This table will be used as follows:
+    -- When we extract an IMSI from a request we will iterate over all the IMSI patterns in the table
+    -- until we find a matching pattern. If we find a matching pattern then the sub-table for that pattern
+    -- will contain the backends that we should route to, ordered by priority. If the first backend isn't
+    -- available then we can move onto the next next backend by priority.
+    --
+    -- @param mapping_file The mapping file to be loaded.
+    --
+    -- @param backends The available backends.
+    --
+    function stratum_mappings:new(mapping_file, backends)
+      local o = {}
+      setmetatable(o, self)
+      self.__index = self
+
+      o.mapping_file = mapping_file
+      o.backends = backends
+      o.number_of_mappings = 0
+      o.mappings = {}
+
+      o:read_mapping_file()
+
+      -- Count the number of partition mappings.
+      for _, _ in pairs(o.mappings) do
+        o.number_of_mappings = o.number_of_mappings + 1
+      end
+
+      return o
+    end
+
+    function stratum_mappings:get_mappings()
+      return self.mappings
+    end
+
+    function stratum_mappings:read_mapping_file()
+      core.Debug("Loading partition mapping file " .. self.mapping_file)
+
+      local f = io.open(self.mapping_file, "rb")
+      if f == nil then
+        core.Alert("ERROR: Failed to open the IMSI mapping file: " .. self.mapping_file)
+        return
+      end
+
+      for line in io.lines(self.mapping_file) do
+        self:parse_partition_mapping_line(line)
+      end
+
+      f:close()
+    end
+
+    function stratum_mappings:parse_partition_mapping_line(line)
+      -- Ignore lines starting with a comment.
+      if line:match('^#') == nil then
+        -- Match <site name>:<imsi pattern>:<priority number>
+        local site_name, imsi_pattern, priority = line:match("^%s*(%g*)%s*:%s*(%g*)%s*:%s*(%d*)%s*$")
+        if site_name and imsi_pattern and priority then
+
+          local imsi_mapping = self.mappings[imsi_pattern]
+          local site_name_pattern = string_utils.escape_pattern(site_name)
+          local ingress_name_pattern = site_name_pattern .. "%-ingress"
+
+          -- Find the backend that matches the site name.
+          local be = nil
+          if self.backends then
+            for _, backend in pairs(self.backends) do
+              local backend_name = backend:get_name()
+              local ingress_backend = backend_name:match(ingress_name_pattern)
+              if ingress_backend then
+                be = backend
+                break
+              end
+            end
+          end
+
+          -- For each IMSI pattern we store:
+          --  * The site priority.
+          --  * The site name.
+          --  * The backend that maps to that site.
+          local site_priority = { priority, site_name, be }
+
+          if imsi_mapping == nil then
+            self.mappings[imsi_pattern] = {}
+          end
+
+          imsi_mapping = self.mappings[imsi_pattern]
+          table.insert(imsi_mapping, site_priority)
+
+          -- Order by priority
+          table.sort(imsi_mapping, function(a, b)
+            -- Comparing the priority values. Index 1 is the priority.
+            return a[1] < b[1]
+          end)
+
+        end
+      end
+    end
+
+    ------
+    -- Logs all of the partition mappings.
+    --
+    -- @param mapping_file The mapping file that contains the partition mappings.
+    --
+    function stratum_mappings:log_mappings(mapping_file)
+      core.Info("IMSI mappings from file: " .. mapping_file)
+      for imsi_pattern, site_and_priority_mappings in pairs(self.mappings) do
+        core.Info("IMSI pattern: " .. imsi_pattern)
+        for _, site_and_priority in pairs(site_and_priority_mappings) do
+          local priority = site_and_priority[1]
+          local site_name = site_and_priority[2]
+          core.Info("    Site = [" .. site_name .. "] - Priority = [" .. priority .. "]")
+        end
+      end
+    end
+
+    function stratum_mappings:find_matching_site(backend_name)
+      for _, site_and_priority_mappings in pairs(self.mappings) do
+        for _, site_and_priority in pairs(site_and_priority_mappings) do
+          local site_name = site_and_priority[2]
+
+          -- We're using the site name in a pattern search. Ensure that any reserved
+          -- Lua 'magic characters' are escaped before applying the pattern.
+          local site_pattern = string_utils.escape_pattern(site_name)
+          if backend_name:match(site_pattern) then
+            return site_name
+          end
+        end
+      end
+
+      return nil
+    end
+
+    function stratum_mappings:get_number_of_mappings()
+      return self.number_of_mappings
+    end
+
+    return stratum_mappings
+
+  string_utils.lua: |
+    local string_utils = {}
+
+    function string_utils.escape_pattern(p)
+      return p:gsub("-", "%%-"):gsub("%.", "%%.")
+    end
+
+    return string_utils
