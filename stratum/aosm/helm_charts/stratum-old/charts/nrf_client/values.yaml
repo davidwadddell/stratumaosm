@@ -1,0 +1,102 @@
+pod_name: nrf-client
+replicas: 2
+
+reload_config: true
+reload_logging_config: true
+liveness_grace: 30
+http_port: 9090
+
+stratum_client:
+  poll_interval: 5s
+  request_timeout: 1s
+  request_retries: 3
+nrf_client:
+  poll_interval: 5s
+  request_timeout: 1s
+  retry_interval: 30s
+  request_retries: 1
+  heartbeat_timer_multiplier: 0.95
+  on_stratum_stale: stop
+#
+# Example nrf and profiles
+# nrfs:
+#   - name: west_nrf
+#     geo_region: WEST
+#     endpoints:
+#       - "http://10.244.13.28:7777"
+#       - "http://10.244.110.255:7777"
+#     profiles:
+#       - "west_p1_reg_profile.json"
+# profiles:
+#   - name: west_p1_reg_profile
+#     json: |
+#       {
+#         "allowedNfTypes": [
+#          "NEF",
+#          "HSS",
+#          "UDM",
+#          "PCF",
+#          "UDR"
+#        ],
+#        "fqdn": "zupt01acudr01.udr.5gc.mnc180.mcc311.3gppnetwork.org",
+#        "ipv4Addresses": [
+#        "127.7.45.155"
+#        ],
+#        "locality": "WEST",
+#        "nfInstanceId": "cccccccc-0161-4b27-802e-7e002d5b4a43",
+#        "nfServices": [
+#           {
+#             "allowedNfTypes": [
+#                 "NEF",
+#                 "HSS",
+#                 "UDM",
+#                 "PCF",
+#                 "UDR"
+#             ],
+#             "fqdn": "zupt01acudr01.udr.5gc.mnc180.mcc311.3gppnetwork.org",
+#             "ipEndPoints": [
+#                 {
+#                     "ipv4Address": "127.7.45.155",
+#                     "port": 8001
+#                 }
+#             ],
+#             "nfServiceStatus": "REGISTERED",
+#             "scheme": "http",
+#             "serviceInstanceId": "cccccccc-0161-4b27-802e-7e002d5b4a43",
+#             "serviceName": "nudr-dr",
+#             "versions": [
+#                 {
+#                     "apiFullVersion": "2.0.0.alpha-1",
+#                     "apiVersionInUri": "v2"
+#                 }
+#             ]
+#         }
+#       ],
+#       "nfStatus": "REGISTERED",
+#       "nfType": "UDR",
+#       "priority": 65501,
+#       "udrInfoList": {
+#           "1": {
+#               "groupId": "upt01a"
+#           },
+#           "2": {
+#               "groupId": "P1",
+#               "supiRanges": [
+#                 {
+#                     "pattern": "^imsi-\\d{8}00[0-4]0\\d{3}$"
+#                 },
+#                 {
+#                     "pattern": "^imsi-\\d{8}00[0-4]2\\d{3}$"
+#                 }
+#             ]
+#           }
+#         }
+#       }
+
+logging: 
+  nrf_client:
+    in: WARNING
+    out: WARNING
+  stratum: INFO
+  root: WARNING
+

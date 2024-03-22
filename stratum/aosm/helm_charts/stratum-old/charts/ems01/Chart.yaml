@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 4.3.0
+description: EMS01 chart for stratum
+name: ems01
+type: application
+version: 4.3.0

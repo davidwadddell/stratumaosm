@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: 4.3.0
+description: A Helm chart for Kubernetes to start a set of nrf client pods for a stratum
+  site
+name: nrf_client
+type: application
+version: 4.3.0

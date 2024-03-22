@@ -1,0 +1,143 @@
+{{- if .Values.global.useConfigProxies -}}
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ empty .Values.stratum_site | ternary .Values.stratum_region .Values.stratum_site  }}-{{ .Values.cpx.stfl_set_name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podManagementPolicy: Parallel
+  replicas: {{ .Values.cpx.replicas }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: {{ .Values.cpx.pod_name }}
+  serviceName: {{ .Values.global.headlessService.name }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.cpx.pod_name }}
+        app: {{ .Values.global.headlessService.selectorAppName }}
+    spec:
+      nodeSelector:
+{{- if .Values.cpx.nodeSelector }}
+{{ toYaml .Values.cpx.nodeSelector | indent 8 }}
+{{- end }}
+      volumes:
+         - name: keys-v
+           secret:
+              secretName: {{ .Values.global.ssh_Secrets | default .Values.global.ssh_SecretsName }}
+              defaultMode: 0600
+{{ template "dns.config" $ }}
+      securityContext:
+        runAsUser: 1401
+        fsGroup: 401
+{{- if  .Values.global.multiWorkerNode   }}        
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: name
+                operator: In
+                values:
+                - {{ .Values.cpx.pod_name }}
+            topologyKey: "kubernetes.io/hostname"
+{{- end }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      initContainers:
+      - name: init-registration
+        image: {{ .Values.init_container_image }}
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        command: ["/bin/sh","-c"]
+        args: 
+        - url=https://ems01:8443/OAM/restapi/status; 
+           while [ $(curl -k -sw '%{http_code}' $url -o /dev/null) -ne 200 ]; do 
+             echo $(date +"%b %d %H:%M:%S") "Waiting for the EMS registration server at $url"; 
+             sleep 5;  
+           done
+        resources:
+{{ toYaml $.Values.initContainers.resources | indent 10 }}
+      containers:
+       - name: {{ .Values.cpx.ctr_name }}
+         image: {{ .Values.cpx.image | default (print .Values.global.imagesRegistry "/stratum_cp:" .Chart.Version ) }}
+         imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+{{- if  .Values.global.multiWorkerNode   }}         
+         resources:
+           limits:
+             cpu: '{{ .Values.cpx.cpu_limit }}'
+             memory: {{ .Values.cpx.mem_limit }}
+           requests:
+             cpu: '{{ .Values.cpx.cpu_request }}'
+             memory: {{ .Values.cpx.mem_request }}
+{{- end }}
+         securityContext:
+          capabilities:
+            add:          
+            - NET_BIND_SERVICE
+            - SYS_CHROOT
+            - SYS_PTRACE
+            - AUDIT_WRITE            
+#   readiness probe cannot be used with SS, as stratum requires minimum of 3 to form cluster - and k8s won't launch next pod in SS until first is 'ready'
+#   update : it can work with spec.podManagementPolicy=Parallel; but that may need review when it comes to patching/upgrade use cases
+         readinessProbe:
+           exec:
+             command: [ "/bin/sh",  "-c", "pgrep  netdata && pgrep -f Aggregator && pgrep  -f tomcat && pgrep grafana && pgrep prometheus" ]
+           timeoutSeconds: {{ .Values.readinessProbeTimeout }}
+         livenessProbe:
+           exec:
+             command: [ "/bin/sh",  "-c", "pgrep  netdata && pgrep -f Aggregator && pgrep  -f tomcat && pgrep grafana && pgrep prometheus" ]
+           timeoutSeconds: {{ .Values.livenessProbeTimeout }}
+           failureThreshold: {{ .Values.livenessFailureThreshold }}
+           periodSeconds: {{ .Values.livenessProbePeriod }}
+         startupProbe:
+           exec:
+             command: [ "/bin/sh",  "-c", "pgrep  netdata && pgrep -f Aggregator && pgrep  -f tomcat && pgrep grafana && pgrep prometheus" ]
+           timeoutSeconds: {{ .Values.startupProbeTimeout }}
+           failureThreshold: {{ .Values.startupFailureThreshold }}
+           periodSeconds: {{ .Values.startupProbePeriod }}
+         lifecycle:
+           preStop:
+             exec:
+               command: ["/bin/sh","-c","/etc/init.d/oamsca-v* stop"]
+         env:
+         - name: TZ
+           value: {{ .Values.global.timezone }}
+         - name: FE_TYPE
+           value: EMSCP
+         - name: REGION
+           value: {{ .Values.stratum_region  }}
+         - name: CS_HOSTNAME_ENV
+           value: ems01
+         - name: CS_OTHER_HOSTNAME_ENV
+           value: ems02
+         command: ["/bin/sh"]
+         args: ["-c", "/opt/opwv/run.sh"]
+         volumeMounts:
+         - name: keys-v
+           mountPath: "/root/.ssh/id_rsa"
+           subPath: "id_rsa"
+         - name: keys-v
+           mountPath: "/root/.ssh/id_rsa.pub"
+           subPath: "id_rsa.pub"
+         - name: keys-v
+           mountPath: "/root/.ssh/id_dsa"
+           subPath: "id_dsa"
+         - name: keys-v
+           mountPath: "/root/.ssh/id_dsa.pub"
+           subPath: "id_dsa.pub"
+{{- if .Values.global.createCoreVolumes }}
+         - name: corevol
+           mountPath: "/var/opt/opwv/cores"
+  volumeClaimTemplates:
+  - metadata:
+      name: corevol
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "{{ .Values.global.storageClass }}"
+      resources:
+        requests:
+         storage: {{ .Values.cpx.cores_vol_request }}
+{{- end }}
+{{- end }}

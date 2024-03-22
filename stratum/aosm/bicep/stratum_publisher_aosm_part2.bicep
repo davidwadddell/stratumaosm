@@ -63,6 +63,13 @@ var nFAs = [for (hchart, index) in helm_charts.charts: {
       releaseName: hchart.releaseName
       helmPackageVersion: '{deployParameters.charts[${index}].Version}'
       values: '{deployParameters.charts[${index}].Values}'
+      options: {
+        installOptions: {
+          atomic: 'false'
+          wait: 'true'
+          timeout: '100'
+        }
+      }
     }
   }
 }]

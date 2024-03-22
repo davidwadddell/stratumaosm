@@ -1,0 +1,69 @@
+# Probe configuration
+# Kubernetes defaults to 1 second which may not be long enough
+readinessProbeTimeout: 4
+livenessProbeTimeout: 2
+startupProbeTimeout: 2
+
+# How often the probes run (seconds)
+livenessProbePeriod: 10
+startupProbePeriod: 10
+
+# Number of failures before abort
+livenessFailureThreshold: 30
+startupFailureThreshold: 60
+pod_name: ems01
+replicas: 1
+image:
+cpu_request: 1
+cpu_limit: 2
+mem_request: 1024Mi
+mem_limit: 8092Mi
+
+optopwv_pvc:
+  name: ems01vol-optopwv-claim
+  cloneFrom:
+optopwv_vol_request: 10Gi
+
+ordb_pvc:
+  name: ems01vol-ordb-claim
+  cloneFrom:
+ordb_vol_request: 10Gi
+ 
+varoptopwv_vol_request: 10Gi  
+
+# Volumes for OST artifacts/monitoring
+toolsreportingrepo_vol_request: 5Gi
+remotenotify_vol_request: 5Gi
+
+standard_cli_script: |
+  #!/bin/bash
+
+  echo "Running standard EMS CLI script"
+
+  ems_version=$(ls /opt/opwv/oam)
+  OAMCLI="/opt/opwv/oam/${ems_version}/bin/OamCommandLine -u rest -p restpass -h localhost "
+
+  echo "Configuring logging to console"
+
+  $OAMCLI  -s "OAM v${ems_version}" -scopedSubLevels -c "update Complex//OAMCore/Logging/AppLog/appender:ConsoleAppender"
+  $OAMCLI  -s "SdmceSystem" -scopedSubLevels -c "update Complex//OAMCore/Logging/AppLog/appender:ConsoleAppender"
+
+  echo "Disabling Host IP Validation for ConfigServer and ConfigProxyServer"
+  $OAMCLI  -s "OAM v${ems_version}" -c "update Complex/ConfigServer//OAMCore/SCPServlet/DisableHostIPValidation:true"
+  $OAMCLI  -s "OAM v${ems_version}" -c "update Complex/ConfigProxyServer//OAMCore/SCPServlet/DisableHostIPValidation:true"
+
+  echo "Remove VIP listening ports"
+  
+  $OAMCLI -scopedSubLevels -s "SdmceSystem" -c "deleteCfg Complex/ILDElement//ILDTrafficServer/http.server_ports/[InterfaceIPAddress=VIP]"
+  $OAMCLI -scopedSubLevels -s "SdmceSystem" -c "deleteCfg Complex/ILDElement//ILDTrafficServer/http.server_ports/[InterfaceIPAddress=ild_to_lba"]
+  $OAMCLI -scopedSubLevels -s "SdmceSystem" -c "deleteCfg Complex/ILDElement//ILDTrafficServer/http.server_ports/[InterfaceIPAddress=mgmt"]
+
+  echo "Standard CLI script complete"
+  exit 0
+custom_cli_script: |
+  #!/bin/bash
+  echo "Running custom EMS CLI script"
+  echo "Completed custom EMS CLI script"
+  exit 0
+
+enable_logging_components: false

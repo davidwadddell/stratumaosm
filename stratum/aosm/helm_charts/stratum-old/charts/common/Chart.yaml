@@ -1,0 +1,4 @@
+apiVersion: v2
+description: common k8s object for stratum application
+name: common
+version: 4.3.0

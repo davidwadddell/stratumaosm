@@ -1,0 +1,42 @@
+apiVersion: "2"
+appVersion: 4.3.1-GA
+dependencies:
+- name: common
+  repository: ""
+  tags:
+  - deployCommon
+  version: 4.3.1-GA
+- name: ems01
+  repository: ""
+  tags:
+  - deployEms01
+  version: 4.3.1-GA
+- name: ems02
+  repository: ""
+  tags:
+  - deployEms02
+  version: 4.3.1-GA
+- name: regions
+  repository: ""
+  tags:
+  - deployRegions
+  version: 4.3.1-GA
+- name: pytestclient
+  repository: ""
+  tags:
+  - deployPyTest
+  version: 4.3.1-GA
+- name: nrf_client
+  repository: ""
+  tags:
+  - deployNrfClient
+  version: 4.3.1-GA
+- name: haproxy-ingress
+  repository: https://haproxy-ingress.github.io/charts
+  tags:
+  - deployHAProxy
+  version: 0.14.5
+description: Helm chart for the stratum application.
+name: stratum
+type: application
+version: 4.3.1-GA

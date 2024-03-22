@@ -1,0 +1,46 @@
+global:
+  imageRegistry: eneapublishereneaartifactstore138c564a8f.azurecr.io
+  imagePullSecrets: [stratum-common-acrpull]
+    
+prometheus:
+  prometheusSpec:
+    image:
+      repository: prometheus
+
+prometheusOperator:
+  image:
+    repository: prometheus-operator
+  prometheusConfigReloader:
+    image:
+      repository: prometheus-config-reloader
+  admissionWebhooks:
+    deployment:
+      image:
+        repository:
+          admission-webhook: admission-webhook  
+    patch:
+      image:
+        repository: kube-webhook-certgen
+        tag: v1.0     
+
+prometheus-node-exporter:
+  image:
+    repository: node-exporter
+
+grafana:
+  image:
+    repository: grafana
+  sidecar:
+    image:
+      repository: k8s-sidecar
+
+kube-state-metrics:
+  image:
+    repository: kube-state-metrics
+
+alertmanager:
+  alertmanagerSpec:
+    image:
+      repository: alertmanager
+      tag: v0.27.2
+
