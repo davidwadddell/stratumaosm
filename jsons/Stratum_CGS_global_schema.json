@@ -1,0 +1,55 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "title": "GeneratedFromValuesYaml",
+    "properties": {
+        "global": {
+            "type": "object",
+            "properties": {
+                "imagePullPolicy": { "type": "string" }, 
+                "storageClass": { "type": "string" },
+                "ildService": {
+                    "type": "object",
+                    "properties": {
+                        "loadBalancerIPs": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }                
+                    }
+                },
+                "timezone": { "type": "string" },
+                "emsServices": {
+                    "type": "object",
+                    "properties": {
+                        "loadBalancerIPs" : {
+                            "type": "object",
+                            "properties": {
+                                "ems01": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "ems02": { 
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }    
+                },
+                "daemonset" :{
+                    "type": "object",
+                    "properties": {
+                        "image": { "type": "string" }
+                    }
+                }
+            }
+        }
+    }
+}   
+                
