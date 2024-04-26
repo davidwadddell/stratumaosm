@@ -1,0 +1,251 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stratum-{{ .Values.pod_name }}
+spec:
+  replicas: {{ .Values.replicas }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: {{ .Values.pod_name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.pod_name }}
+        app: {{ .Values.pod_name }}
+    spec:
+      nodeSelector:
+{{- if .Values.nodeSelector }}
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}    
+      hostAliases:
+{{- if .Values.global.useConfigProxies -}}
+{{- range $host := .Values.ems.otherRegionsPrometheusScrapeTargets }}
+      - ip: "{{ $host.ip }}"
+        hostnames:
+          - {{ $host.hostname }}
+{{- end }}
+{{- end }}
+{{ template "dns.config" $ }}
+      volumes:
+      - name: keys-v
+        secret:
+          secretName: {{ .Values.global.ssh_Secrets | default .Values.global.ssh_SecretsName }}
+          defaultMode: 0600
+      - name:  vol-optopwv
+        persistentVolumeClaim:
+          claimName:  {{ .Values.optopwv_pvc.name }}
+      - name: vol-varoptopwv
+        persistentVolumeClaim:
+          claimName: {{ .Values.pod_name }}vol-varoptopwv-claim
+      - name: vol-ordb
+        persistentVolumeClaim:
+          claimName: {{ .Values.ordb_pvc.name }}
+      - name: {{ .Values.pod_name }}vol-standard-configmap
+        configMap:
+          name: {{ .Values.pod_name }}-standard-configmap
+          defaultMode: 0777
+      - name: {{ .Values.pod_name }}vol-custom-configmap
+        configMap:
+          name: {{ .Values.pod_name }}-custom-configmap
+          defaultMode: 0777
+      - name: vol-toolsreportingrepo
+        persistentVolumeClaim:
+          claimName: {{ .Values.pod_name }}vol-toolsreportingrepo-claim
+      - name: vol-remotenotify
+        persistentVolumeClaim:
+          claimName: {{ .Values.pod_name }}vol-remotenotify-claim
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+      - env:
+        - name: TZ
+          value: {{ .Values.global.timezone }}      
+        - name: FE_TYPE
+          value: EMS
+        - name: REGION
+          value: Core
+        - name: ENV_INSTANCE_ID_START
+          value: '{{ .Values.global.ems.instance_id_start }}'
+        - name: ENABLE_LOGGING_COMPONENTS
+          value: '{{ .Values.enable_logging_components }}'
+        image: {{ .Values.image | default (print .Values.global.imagesRegistry "/stratum_ems:" .Chart.Version ) }}
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - /etc/init.d/oamcs* stop
+        name: {{ .Values.pod_name }}
+        readinessProbe:
+          exec:
+            command: [ "/bin/sh",  "-c", "pgrep mysqld && pgrep netdata && pgrep -x grafana && pgrep prometheus && pgrep alertmanager && pgrep -P 1 -f org.apache.catalina.startup.Bootstrap && pgrep -f DFMService && pgrep -f AggregatorService && pgrep -f ORElementWrapper" ]
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: {{ .Values.readinessProbeTimeout }}
+        livenessProbe:
+          exec:
+            command: [ "/bin/sh",  "-c", "pgrep mysqld && pgrep netdata && pgrep -x grafana && pgrep prometheus && pgrep alertmanager && pgrep -P 1 -f org.apache.catalina.startup.Bootstrap && pgrep -f DFMService && pgrep -f AggregatorService && pgrep -f ORElementWrapper" ]
+          timeoutSeconds: {{ .Values.livenessProbeTimeout }}
+          failureThreshold: {{ .Values.livenessFailureThreshold }}
+          periodSeconds: {{ .Values.livenessProbePeriod }}
+        startupProbe:
+          exec:
+            command: [ "/bin/sh",  "-c", "pgrep mysqld && pgrep netdata && pgrep -x grafana && pgrep prometheus && pgrep alertmanager && pgrep -P 1 -f org.apache.catalina.startup.Bootstrap && pgrep -f DFMService && pgrep -f AggregatorService && pgrep -f ORElementWrapper" ]
+          timeoutSeconds: {{ .Values.startupProbeTimeout }}
+          failureThreshold: {{ .Values.startupFailureThreshold }}
+          periodSeconds: {{ .Values.startupProbePeriod }}       
+        securityContext:
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            - SYS_CHROOT
+            - AUDIT_WRITE
+        command: 
+          - /bin/sh
+          - -c
+          - sudo chown -R opwv:opwv  /etc/opwv  && /opt/opwv/run.sh 
+{{- if  .Values.global.multiWorkerNode   }}
+        resources:
+          limits:
+            cpu: '{{ .Values.cpu_limit }}'
+            memory: {{ .Values.mem_limit }}
+          requests:
+            cpu: '{{ .Values.cpu_request }}'
+            memory: {{ .Values.mem_request }}
+{{- end }}
+        volumeMounts:
+           - name:  vol-optopwv
+             mountPath: "/opt/opwv/oam/4.1/cfgroot"
+           - name: vol-varoptopwv
+             mountPath: "/var/opt/opwv"
+           - name: vol-ordb 
+             mountPath: "/opt/opwv/data"
+           - name: {{ .Values.pod_name }}vol-standard-configmap
+             mountPath: "/opt/opwv/scripts/standard"
+           - name: {{ .Values.pod_name }}vol-custom-configmap
+             mountPath: "/opt/opwv/scripts/custom"           
+           - name: keys-v
+             mountPath: "/root/.ssh/id_rsa"
+             subPath: "id_rsa"
+           - name: keys-v
+             mountPath: "/root/.ssh/id_rsa.pub"
+             subPath: "id_rsa.pub"
+           - name: keys-v
+             mountPath: "/root/.ssh/id_dsa"
+             subPath: "id_dsa"
+           - name: keys-v
+             mountPath: "/root/.ssh/id_dsa.pub"
+             subPath: "id_dsa.pub"
+           - name: vol-toolsreportingrepo
+             mountPath: "/opt/opwv/oam/4.1/tools/reporting/repo"
+           - name: vol-remotenotify
+             mountPath: "/opt/opwv/oam/4.1/remotenotify"
+      hostname: {{ .Values.pod_name }}
+      restartPolicy: Always
+      securityContext:
+        runAsUser: 1401
+        fsGroup: 401      
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.optopwv_pvc.name }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/resource-policy": keep
+spec:
+  storageClassName: "{{ .Values.global.storageClass }}"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.optopwv_vol_request }}
+{{- if .Values.optopwv_pvc.cloneFrom }}
+  dataSource:
+      kind: PersistentVolumeClaim
+      name: {{ .Values.optopwv_pvc.cloneFrom }}
+{{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.pod_name }}vol-varoptopwv-claim
+  namespace: {{ .Release.Namespace }}
+spec:
+  storageClassName: "{{ .Values.global.storageClass }}"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.varoptopwv_vol_request }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.ordb_pvc.name }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/resource-policy": keep
+spec:
+  storageClassName: "{{ .Values.global.storageClass }}"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.ordb_vol_request }}
+{{- if .Values.ordb_pvc.cloneFrom }}
+  dataSource:
+      kind: PersistentVolumeClaim
+      name: {{ .Values.ordb_pvc.cloneFrom }}
+{{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.pod_name }}vol-toolsreportingrepo-claim
+  namespace: {{ .Release.Namespace }}
+spec:
+  storageClassName: "{{ .Values.global.storageClass }}"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.toolsreportingrepo_vol_request }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.pod_name }}vol-remotenotify-claim
+  namespace: {{ .Release.Namespace }}
+spec:
+  storageClassName: "{{ .Values.global.storageClass }}"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.remotenotify_vol_request }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.pod_name }}-standard-configmap
+  namespace: {{ .Release.Namespace }}  
+data:
+  standard-cli-script.sh: {{- toYaml .Values.standard_cli_script | nindent 12 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.pod_name }}-custom-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  custom-cli-script.sh: {{- toYaml .Values.custom_cli_script | nindent 12 }}

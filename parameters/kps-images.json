@@ -1,0 +1,45 @@
+{
+  "images": [
+    {
+      "name": "prometheus-config-reloader",
+      "version": "v0.71.2"
+    },
+    {
+      "name": "prometheus-operator",
+      "version": "v0.71.2"
+    },
+    {
+      "name": "grafana",
+      "version": "10.3.3"
+    },
+    {
+      "name": "k8s-sidecar",
+      "version": "1.25.2"
+    },
+    {
+      "name": "kube-state-metrics",
+      "version": "v2.10.1"
+    },
+    {
+        "name": "kube-webhook-certgen",
+        "version": "v1.0"
+    },
+    {
+        "name": "node-exporter",
+        "version": "v1.7.0"
+    },
+    {
+        "name": "prometheus",
+        "version": "v2.50.1"
+    },
+    {
+        "name": "alertmanager",
+        "version": "v0.27.2"
+    },
+    {
+        "name": "thanos",
+        "version": "v0.34.1"
+    }
+  ]
+}
+

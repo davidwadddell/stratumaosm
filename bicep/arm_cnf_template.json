@@ -1,0 +1,80 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.24.24.22086",
+      "templateHash": "17601303788442004620"
+    }
+  },
+  "parameters": {
+    "publisherName": {
+      "type": "string",
+      "defaultValue": "TestPublisher"
+    },
+    "nfdgroupName": {
+      "type": "string",
+      "defaultValue": "TestNFDGroup"
+    },
+    "nfdversion": {
+      "type": "string",
+      "defaultValue": "1.0.0"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "nfvId": {
+      "type": "string",
+      "defaultValue": "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/aosm-demo/providers/microsoft.extendedlocation/customlocations/aosmcluster-custom-location"
+    },
+    "nfdvId": {
+      "type": "string",
+      "defaultValue": "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/aosm-demo/providers/microsoft.hybridnetwork/publishers/{publisherName}/networkFunctionDefinitionGroups/{nfdg}/networkFunctionDefinitionVersions/{nfdv}"
+    },
+    "charts": {
+      "type": "array"
+    },
+    "cnfName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "copy": [
+      {
+        "name": "charts2",
+        "count": "[length(parameters('charts'))]",
+        "input": {
+          "Values": "[string(parameters('charts')[copyIndex('charts2')].Values)]",
+          "Version": "[parameters('charts')[copyIndex('charts2')].Version]"
+        }
+      }
+    ],
+    "vals": {
+      "charts": "[variables('charts2')]"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.HybridNetwork/networkFunctions",
+      "apiVersion": "2023-09-01",
+      "name": "[parameters('cnfName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "configurationType": "Open",
+        "networkFunctionDefinitionVersionResourceReference": {
+          "id": "[parameters('nfdvId')]",
+          "idType": "Open"
+        },
+        "nfviType": "AzureArcKubernetes",
+        "nfviId": "[parameters('nfvId')]",
+        "allowSoftwareUpdate": true,
+        "deploymentValues": "[string(variables('vals'))]"
+      }
+    }
+  ]
+}

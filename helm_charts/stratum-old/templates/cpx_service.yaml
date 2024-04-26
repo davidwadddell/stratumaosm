@@ -1,0 +1,47 @@
+{{- if .Values.global.useConfigProxies -}}
+{{- range $i, $cpxService := .Values.cpxServices }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $cpxService.name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{ $cpxService.loadBalancerIP }}
+  ports:
+    - name: grafana
+      port: {{ $cpxService.grafana.port }}
+      protocol: TCP
+      targetPort: {{ $cpxService.grafana.targetPort }}
+    - name: netdata
+      port: {{ $cpxService.netdata.port }}
+      protocol: TCP
+      targetPort: {{ $cpxService.netdata.targetPort }}
+  selector:
+    statefulset.kubernetes.io/pod-name: {{ $.Values.stratum_region }}-{{ $.Values.cpx.stfl_set_name }}-{{$i}}
+{{- end }}
+{{- range $i, $cpxemsService := .Values.cpxemsServices }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $cpxemsService.name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{ $cpxemsService.loadBalancerIP }}
+  externalTrafficPolicy: Local
+  ports:
+    - name: grafana
+      port: {{ $cpxemsService.grafana.port }}
+      protocol: TCP
+      targetPort: {{ $cpxemsService.grafana.targetPort }}
+    - name: netdata
+      port: {{ $cpxemsService.netdata.port }}
+      protocol: TCP
+      targetPort: {{ $cpxemsService.netdata.targetPort }}
+  selector:
+    statefulset.kubernetes.io/pod-name: {{ $.Values.stratum_region }}-{{ $.Values.cpx.stfl_set_name }}-{{$i}}
+{{- end }}
+{{- end }}

@@ -1,0 +1,67 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ .Values.global.site }}-{{ .Values.pod_name }} 
+  namespace: {{ .Release.Namespace }}
+spec:
+  podManagementPolicy: Parallel
+  replicas: {{ .Values.replicas }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: {{ .Values.pod_name }}
+  serviceName: {{ .Values.global.headlessService.name }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.pod_name }}
+        app: {{ .Values.global.headlessService.selectorAppName }}
+    spec:
+{{ template "dns.config" $ }}
+     {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      volumes:
+         - name: keys-v
+           secret:
+                  secretName: {{ .Values.global.ssh_Secrets | default .Values.global.ssh_SecretsName }}
+                  defaultMode: 0600
+      serviceAccountName: {{ .Values.global.kubectlServiceAccountName }}                      
+      containers:
+       - name: {{ .Values.pod_name  }}
+         image: {{ .Values.image | default (print .Values.global.imagesRegistry "/pytest:" .Chart.Version ) }}
+         imagePullPolicy: Always
+         resources:
+           limits:
+             cpu: {{ .Values.cpu_limit }}
+             memory: {{ .Values.mem_limit }}
+           requests:
+             cpu: {{ .Values.cpu_request }}
+             memory: {{ .Values.mem_request }}
+         volumeMounts:
+           - name: keys-v
+             mountPath: "/root/.ssh/id_rsa"
+             subPath: "id_rsa"
+           - name: keys-v
+             mountPath: "/root/.ssh/id_rsa.pub"
+             subPath: "id_rsa.pub"
+           - name: keys-v
+             mountPath: "/root/.ssh/id_dsa"
+             subPath: "id_dsa"
+           - name: keys-v
+             mountPath: "/root/.ssh/id_dsa.pub"
+             subPath: "id_dsa.pub" 
+         securityContext:
+           capabilities:
+             add:
+             - SYS_CHROOT
+             - AUDIT_WRITE
+         lifecycle:
+           postStart:
+             exec:
+               command: ["/bin/sh", "-c", "version=$(cat /etc/owm-version-info) && sed -i \"s/container_install = False/container_install = True/g\" /opt/opwv/sdmCD/$version/tests/properties.py && sed -i \"s/jenkins_env = True/jenkins_env = False/g\" /opt/opwv/sdmCD/$version/tests/properties.py && sed -i \"s/all_site_nodes\\[node_type\\]\\[site_number\\]\\[region_number\\]\\.append(host\\['ipaddress'\\])/all_site_nodes\\[node_type\\]\\[site_number\\]\\[region_number\\]\\.append(host\\['hostname'\\])/g\" /opt/opwv/sdmCD/$version/tests/properties.py"]
+         readinessProbe:
+           exec:
+               command: ["/bin/sh", "-c", "version=$(cat /etc/owm-version-info) && cat /opt/opwv/sdmCD/$version/tests/properties.py | grep container_install | grep True && cat /opt/opwv/sdmCD/$version/tests/properties.py | grep jenkins_env | grep False && cat /opt/opwv/sdmCD/$version/tests/properties.py | grep \"all_site_nodes\\[node_type\\]\\[site_number\\]\\[region_number\\]\\.append(host\\['hostname'\\])\" | grep hostname"]
+           timeoutSeconds: {{ .Values.readinessProbeTimeout }}
+           initialDelaySeconds: {{ .Values.initialDelaySeconds }}       

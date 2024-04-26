@@ -1,0 +1,73 @@
+{
+    "images": [
+      {
+        "name": "stratum_fe",
+        "version": "4.3.0"
+      },
+      {
+        "name": "stratum_ems",
+        "version": "4.3.0"
+      },
+      {
+        "name": "pytest",
+        "version": "4.3.0"
+      },
+      {
+        "name": "rhel7",
+        "version": "latest"
+      },
+      {
+        "name": "haproxy-ingress",
+        "version": "0.14.5"
+      },
+      {
+          "name": "haproxy",
+          "version": "2.8.5"
+      },
+      {
+          "name": "kube-syslog-sidecar",
+          "version": "latest"
+      },
+      {
+          "name": "nrf-client",
+          "version": "4.3.0"
+      },
+      {
+          "name": "ingress-nginx/kube-webhook-certgen",
+          "version": "v20221220-controller-v1.5.1-58-g787ea74b6"
+      },
+      {
+          "name": "prometheus-operator/prometheus-operator",
+          "version": "v0.68.0"
+      },
+      {
+          "name": "prometheus-operator/prometheus-config-reloader",
+          "version": "v0.68.0"
+      },
+      {
+          "name": "prometheus/prometheus",
+          "version": "v2.47.1"
+      },
+      {
+          "name": "kube-state-metrics/kube-state-metrics",
+          "version": "v2.10.0"
+      },
+      {
+          "name": "prometheus/alertmanager",
+          "version": "v0.26.0"
+      },
+      {
+          "name": "kiwigrid/k8s-sidecar",
+          "version": "1.25.1"
+      },
+      {
+          "name": "grafana/grafana",
+          "version": "10.1.5"
+      },
+      {
+          "name": "prometheus/node-exporter",
+          "version": "v1.6.1"
+      }
+    ]
+  }
+  

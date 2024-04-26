@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 4.3.1-GA
+description: A Helm chart to deploy ems02 for the stratum application
+name: ems02
+type: application
+version: 4.3.1-GA

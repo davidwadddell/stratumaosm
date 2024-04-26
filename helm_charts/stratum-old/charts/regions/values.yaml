@@ -1,0 +1,188 @@
+
+regionsToDeploy: [ region1, region2 ]
+
+regions:
+  - name: region1
+    affinities:
+    #  requiredAffinity:   availability-zone In z1,z4
+    #  preferredAffinity:  zone-role In active
+    csmLoadBalancerIPs: [ 192.168.130.141 , 192.168.130.142 ] 
+  - name: region2
+    affinities:
+    #  requiredAffinity:   availability-zone In z1,z4
+    #  preferredAffinity:  zone-role In active
+    csmLoadBalancerIPs: [ 192.168.130.143 , 192.168.130.144 ]
+
+# whether to use taskset to pin processes in adm,ild,csm ; should only be set with kubernetes static CPU policy in use
+process_pinning_enabled: false
+
+init_container_image:  registry.access.redhat.com/rhel7:latest
+ 
+# CSM services - exposes a CSM service for each CSM instance - an IP should be defined for each ie. num IPS == num replicas in CSM stateful set
+csmServices:
+  portRange:
+    start: 8500
+    end:   8505
+
+# to avoid DNS lookups for each other, which can block processing, the FE containers run a script to populate /etc/hosts every x seconds, given by this interval
+hostsFileUpdateInterval: 10
+
+# netdata connection monitoring parameters
+# Restarts of the EMS pods cause any long lived netdata connections from clientsnot to be deleted, the FE containers 
+# run a script to monitor the connection and restart netdata if required
+
+netdataConnectionMonitor:
+  # Netdata port for connections
+  port: 19999
+  # Interval between checks of the netdata connection (seconds)
+  interval: 2
+  # Maximum number of consecutive failures in the netdata connection detected by the monitor script before triggering a netdata restart
+  maxFailures: 3
+
+################################################################################################
+#  Values for the ADM Stateful Set(s)
+################################################################################################
+adm:
+  stfl_set_name: stratum-adm
+  pod_name: adm
+  ctr_name: adm
+  replicas: 3
+  image:
+  cpu_request: 1
+  cpu_limit: 4
+  mem_request: 1024Mi
+  mem_limit: 8092Mi
+  ddm_vol_request: 10Gi
+  cores_vol_request: 5Gi
+  logs_vol_request: 5Gi
+  nodeSelector:
+#   stratum_role: worker
+#
+# ADM Pod Disruption Budget
+# Can be set to minAvailable or maxUnavailable (one only)
+# Example: to set PDB with minAvailable of 1, set to:
+#  podDisruptionBudget:
+#    minAvailable: 1
+# The default in this file is an empty string which means that no PDB budget is applied
+#
+  podDisruptionBudget: {}
+# Probe configuration
+# Kubernetes defaults to 1 second which may not be long enough
+  readinessProbeTimeout: 4
+  livenessProbeTimeout: 2
+  startupProbeTimeout: 4
+  # How often the probes run (seconds)
+  livenessProbePeriod: 10
+  startupProbePeriod: 10
+  # Number of failures before abort
+  livenessFailureThreshold: 30
+  startupFailureThreshold: 60
+  readiness_ipc_timeout_secs: 2
+  readiness_ipc_port: 7500
+  # Whether to create ddmvol volumes. If ADM disk persistence is not required this should be set to false
+  createDdmVolumes: true
+
+################################################################################################
+#  Values for the CSM Stateful Set
+################################################################################################
+csm:
+  stfl_set_name: stratum-csm
+  pod_name: csm
+  ctr_name: csm
+  replicas: 2 
+  image: 
+  cpu_request: 1
+  cpu_limit: 2
+  mem_request: 1024Mi
+  mem_limit: 4046Mi
+  otherRegionCSMs:   # put the names and  ips of other regions' CSMs here. names should match those in host topology
+  - ip: 192.168.230.141
+    hostname: region2-stratum-csm-0.stratum-nodes.stratum.svc.cluster.local
+  - ip: 192.168.230.142
+    hostname: region2-stratum-csm-1.stratum-nodes.stratum.svc.cluster.local
+  nodeSelector:
+#   stratum_role: worker
+  cores_vol_request: 5Gi
+  logs_vol_request: 5Gi
+#
+# CSM Pod Disruption Budget
+# Can be set to minAvailable or maxUnavailable (one only)
+# Example: to set PDB with minAvailable of 1, set to:
+#  podDisruptionBudget:
+#    minAvailable: 1
+# The default in this file is an empty string which means that no PDB budget is applied
+#  
+  podDisruptionBudget: {}
+# Probe configuration
+# Kubernetes defaults to 1 second which may not be long enough
+  readinessProbeTimeout: 4
+  livenessProbeTimeout: 2
+  startupProbeTimeout: 2
+  # How often the probes run (seconds)
+  livenessProbePeriod: 10
+  startupProbePeriod: 10
+  # Number of failures before abort
+  livenessFailureThreshold: 30
+  startupFailureThreshold: 60
+
+
+################################################################################################
+#  Values for the ILD statefulset
+################################################################################################
+ild:
+  stfl_set_name: stratum-ild
+  pod_name: ild
+  ctr_name: ild
+  replicas: 1
+  image:
+  cpu_request: 1
+  cpu_limit: 2
+  mem_request: 1024Mi
+  mem_limit: 4046Mi
+  # Should readiness probe fail if no data found
+  # For ILD if no LDAP data populated after initial install
+  readinessProbeFailIfNoData: "false"
+  nodeSelector:
+#   stratum_role: worker
+  cores_vol_request: 5Gi
+  logs_vol_request: 5Gi
+#
+# ILD Pod Disruption Budget
+# Can be set to minAvailable or maxUnavailable (one only)
+# Example: to set PDB with minAvailable of 1, set to:
+#  podDisruptionBudget:
+#    minAvailable: 1
+# The default in this file is an empty string which means that no PDB budget is applied
+#    
+  podDisruptionBudget: {}
+ 
+  # how many seconds bfore the pod is marked terminating (ie. scheduler reschedules) if the worker node is down or unreachable
+  nodeDownTolerationSeconds: 10
+
+# Probe configuration
+# Kubernetes defaults to 1 second which may not be long enough
+  readinessProbeTimeout: 4
+  livenessProbeTimeout: 2
+  startupProbeTimeout: 2
+  # How often the probes run (seconds)
+  livenessProbePeriod: 10
+  startupProbePeriod: 10
+  # Number of failures before abort
+  livenessFailureThreshold: 30
+  startupFailureThreshold: 60
+
+
+
+################################################################################################
+
+# resource limits for the init-registration init container.
+# these must be set otherwise pods cannot get guaranteed QOS under static CPU policy (ie. where dedicated cpu /  pinning is required)
+initContainers:
+  resources:
+   limits:
+      cpu:     200m
+      memory:  200M
+   requests:
+      cpu:        200m
+      memory:     200M
+

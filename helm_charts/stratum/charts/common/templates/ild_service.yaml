@@ -1,0 +1,16 @@
+{{- range $i,$ip := .Values.global.ildService.loadBalancerIPs }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Values.global.site}}-{{ $.Values.global.ildService.name }}-{{ $i }}
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{ $ip }}
+  ports:
+{{ toYaml $.Values.global.ildService.ports | indent 4 }}
+  selector:
+    name: {{ $.Values.global.ild.pod_name }}
+
+---
+{{- end }}
